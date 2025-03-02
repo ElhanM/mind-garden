@@ -13,24 +13,24 @@ export function MoodHistory() {
     { date: '2023-10-19', mood: 'okay', stressLevel: 3 },
   ];
 
-  const getMoodIcon = (mood) => {
+  const getMoodIcon = (mood: string) => {
     switch (mood) {
       case 'great':
-        return <Sun className="h-6 w-6 text-yellow-500" />;
+        return <Sun className="h-6 w-6 text-amber-500" />;
       case 'good':
-        return <CloudSun className="h-6 w-6 text-yellow-400" />;
+        return <CloudSun className="h-6 w-6 text-yellow-600" />;
       case 'okay':
-        return <Cloud className="h-6 w-6 text-gray-500" />;
+        return <Cloud className="h-6 w-6 text-gray-700" />;
       case 'down':
-        return <CloudRain className="h-6 w-6 text-blue-500" />;
+        return <CloudRain className="h-6 w-6 text-blue-700" />;
       case 'bad':
-        return <CloudLightning className="h-6 w-6 text-purple-600" />;
+        return <CloudLightning className="h-6 w-6 text-purple-800" />;
       default:
-        return <Cloud className="h-6 w-6 text-gray-500" />;
+        return <Cloud className="h-6 w-6 text-gray-700" />;
     }
   };
 
-  const getStressColor = (level) => {
+  const getStressColor = (level: number) => {
     switch (level) {
       case 1:
         return 'bg-green-100/40';
