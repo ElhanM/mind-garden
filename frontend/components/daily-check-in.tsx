@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -10,34 +10,48 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { CheckCircle, Calendar, Sun, CloudSun, Cloud, CloudRain, CloudLightning } from "lucide-react"
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import {
+  CheckCircle,
+  Calendar,
+  Sun,
+  CloudSun,
+  Cloud,
+  CloudRain,
+  CloudLightning,
+} from 'lucide-react';
 
 export function DailyCheckIn() {
-  const [open, setOpen] = useState(false)
-  const [mood, setMood] = useState<string>("")
-  const [stressLevel, setStressLevel] = useState<number[]>([3])
-  const [journal, setJournal] = useState<string>("")
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [mood, setMood] = useState<string>('');
+  const [stressLevel, setStressLevel] = useState<number[]>([3]);
+  const [journal, setJournal] = useState<string>('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = () => {
     // In a real app, this would send data to an API
-    console.log({ mood, stressLevel: stressLevel[0], journal })
-    setIsSubmitted(true)
+    console.log({ mood, stressLevel: stressLevel[0], journal });
+    setIsSubmitted(true);
 
     // Reset form after 2 seconds and close dialog
     setTimeout(() => {
-      setIsSubmitted(false)
-      setOpen(false)
-      setMood("")
-      setStressLevel([3])
-      setJournal("")
-    }, 2000)
-  }
+      setIsSubmitted(false);
+      setOpen(false);
+      setMood('');
+      setStressLevel([3]);
+      setJournal('');
+    }, 2000);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -94,7 +108,13 @@ export function DailyCheckIn() {
               </div>
               <div className="grid gap-2">
                 <Label>Stress Level (1-5)</Label>
-                <Slider value={stressLevel} onValueChange={setStressLevel} max={5} min={1} step={1} />
+                <Slider
+                  value={stressLevel}
+                  onValueChange={setStressLevel}
+                  max={5}
+                  min={1}
+                  step={1}
+                />
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>Very Low</span>
                   <span>Low</span>
@@ -123,11 +143,12 @@ export function DailyCheckIn() {
           <div className="flex flex-col items-center justify-center py-8">
             <CheckCircle className="mb-4 h-16 w-16 text-purple-500" />
             <h3 className="text-xl font-semibold text-purple-700">Check-in Complete!</h3>
-            <p className="mt-2 text-center text-gray-600">Your bonsai tree has been nourished by your reflection.</p>
+            <p className="mt-2 text-center text-gray-600">
+              Your bonsai tree has been nourished by your reflection.
+            </p>
           </div>
         )}
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

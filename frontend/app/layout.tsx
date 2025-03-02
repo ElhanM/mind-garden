@@ -1,32 +1,28 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { PageContainer } from "@/components/page-container"
-import { DailyCheckIn } from "@/components/daily-check-in"
-import { Flame, Menu } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import type React from 'react';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { PageContainer } from '@/components/page-container';
+import { DailyCheckIn } from '@/components/daily-check-in';
+import { Flame, Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "MindGarden",
-  description: "Nurture your mental wellness journey",
-}
+  title: 'MindGarden',
+  description: 'Nurture your mental wellness journey',
+};
 
 const navItems = [
-  { href: "/chat", label: "AI Assistant" },
-  { href: "/profile", label: "Profile" },
-  { href: "/achievements", label: "Achievements" },
-]
+  { href: '/chat', label: 'AI Assistant' },
+  { href: '/profile', label: 'Profile' },
+  { href: '/achievements', label: 'Achievements' },
+];
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -73,15 +69,15 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <footer className="border-t bg-white py-6">
             <PageContainer>
-              <p className="text-center text-sm text-gray-500">MindGarden - Nurture your mental wellness journey</p>
+              <p className="text-center text-sm text-gray-500">
+                MindGarden - Nurture your mental wellness journey
+              </p>
             </PageContainer>
           </footer>
         </div>
       </body>
     </html>
-  )
+  );
 }
 
-
-
-import './globals.css'
+import './globals.css';

@@ -1,9 +1,9 @@
-import type { ReactNode } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import type { ReactNode } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface CardWithTitleProps {
-  title: string
-  children: ReactNode
+  title: string;
+  children: ReactNode;
 }
 
 export function CardWithTitle({ title, children }: CardWithTitleProps) {
@@ -14,6 +14,5 @@ export function CardWithTitle({ title, children }: CardWithTitleProps) {
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>
-  )
+  );
 }
-

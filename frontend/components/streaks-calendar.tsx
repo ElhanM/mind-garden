@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Calendar } from "@/components/ui/calendar";
-import { addMonths, isSameDay, subDays } from "date-fns";
-import { Flame } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { Calendar } from '@/components/ui/calendar';
+import { addMonths, isSameDay, subDays } from 'date-fns';
+import { Flame } from 'lucide-react';
 
 export function StreaksCalendar() {
   const [streakDays, setStreakDays] = useState<Date[]>([]);
@@ -31,9 +31,7 @@ export function StreaksCalendar() {
             DayContent: ({ date }) => (
               <div className="relative flex h-8 w-8 items-center justify-center">
                 {date.getDate()}
-                {streakDays.some((streakDate) =>
-                  isSameDay(date, streakDate)
-                ) && (
+                {streakDays.some((streakDate) => isSameDay(date, streakDate)) && (
                   <Flame className="absolute -top-1 -right-1 h-4 w-4 text-orange-500" />
                 )}
               </div>

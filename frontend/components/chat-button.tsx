@@ -1,63 +1,77 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { MessageSquare, Send } from "lucide-react"
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { MessageSquare, Send } from 'lucide-react';
 
 export function ChatButton() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: "system", content: "Welcome to MindGarden! I'm your mental wellness assistant. How can I help you today?" },
-  ])
-  const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+    {
+      role: 'system',
+      content:
+        "Welcome to MindGarden! I'm your mental wellness assistant. How can I help you today?",
+    },
+  ]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSendMessage = async () => {
-    if (!input.trim()) return
+    if (!input.trim()) return;
 
     // Add user message
-    const userMessage = { role: "user", content: input }
-    setMessages([...messages, userMessage])
-    setInput("")
-    setIsLoading(true)
+    const userMessage = { role: 'user', content: input };
+    setMessages([...messages, userMessage]);
+    setInput('');
+    setIsLoading(true);
 
     // In a real app, this would call an AI API
     setTimeout(() => {
       // Simulate AI response
-      let response
-      if (input.toLowerCase().includes("anxious") || input.toLowerCase().includes("anxiety")) {
+      let response;
+      if (input.toLowerCase().includes('anxious') || input.toLowerCase().includes('anxiety')) {
         response = {
-          role: "assistant",
+          role: 'assistant',
           content:
-            "I understand feeling anxious can be challenging. Have you tried any breathing exercises? Taking 5 deep breaths can help calm your nervous system. Would you like me to guide you through a quick breathing exercise?",
-        }
-      } else if (input.toLowerCase().includes("sad") || input.toLowerCase().includes("down")) {
+            'I understand feeling anxious can be challenging. Have you tried any breathing exercises? Taking 5 deep breaths can help calm your nervous system. Would you like me to guide you through a quick breathing exercise?',
+        };
+      } else if (input.toLowerCase().includes('sad') || input.toLowerCase().includes('down')) {
         response = {
-          role: "assistant",
+          role: 'assistant',
           content:
             "I'm sorry to hear you're feeling down. Remember that it's okay to have these feelings. Would it help to talk about what's causing this feeling, or would you prefer some suggestions for mood-lifting activities?",
-        }
-      } else if (input.toLowerCase().includes("stress") || input.toLowerCase().includes("stressed")) {
+        };
+      } else if (
+        input.toLowerCase().includes('stress') ||
+        input.toLowerCase().includes('stressed')
+      ) {
         response = {
-          role: "assistant",
+          role: 'assistant',
           content:
             "Stress can be overwhelming. One technique that might help is to identify what's in your control and what isn't. For the things you can control, consider making a simple action plan. Would you like to explore some stress management techniques?",
-        }
+        };
       } else {
         response = {
-          role: "assistant",
+          role: 'assistant',
           content:
             "Thank you for sharing. Remember that taking care of your mental health is a journey, and you're making progress by checking in with yourself. Is there anything specific you'd like guidance on today?",
-        }
+        };
       }
 
-      setMessages((prev) => [...prev, response])
-      setIsLoading(false)
-    }, 1000)
-  }
+      setMessages((prev) => [...prev, response]);
+      setIsLoading(false);
+    }, 1000);
+  };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -74,10 +88,15 @@ export function ChatButton() {
         <ScrollArea className="flex-1 pr-4">
           <div className="mt-4 space-y-4">
             {messages.map((message, index) => (
-              <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+              <div
+                key={index}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
                 <div
                   className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                    message.role === "user" ? "bg-purple-600 text-white" : "bg-gray-100 text-gray-800"
+                    message.role === 'user'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-100 text-gray-800'
                   }`}
                 >
                   {message.content}
@@ -91,11 +110,11 @@ export function ChatButton() {
                     <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400"></div>
                     <div
                       className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
-                      style={{ animationDelay: "0.2s" }}
+                      style={{ animationDelay: '0.2s' }}
                     ></div>
                     <div
                       className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
-                      style={{ animationDelay: "0.4s" }}
+                      style={{ animationDelay: '0.4s' }}
                     ></div>
                   </div>
                 </div>
@@ -109,8 +128,8 @@ export function ChatButton() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSendMessage()
+              if (e.key === 'Enter') {
+                handleSendMessage();
               }
             }}
           />
@@ -120,6 +139,5 @@ export function ChatButton() {
         </div>
       </SheetContent>
     </Sheet>
-  )
+  );
 }
-
