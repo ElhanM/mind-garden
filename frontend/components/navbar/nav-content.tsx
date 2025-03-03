@@ -23,7 +23,7 @@ const NavContent = (props: Props) => {
         <div className="flex h-16 items-center justify-between">
           <Link href="/">
             <span className="flex flex-row text-xl font-bold text-purple-700">
-              <Image src="/Logo.png" width={32} height={32} alt="" className="mr-2" />
+              <Image src="/Logo.png" width={32} height={32} alt="Logo" className="mr-2" />
               MindGarden
             </span>
           </Link>
