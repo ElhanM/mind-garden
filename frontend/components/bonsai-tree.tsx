@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 // This component represents the visual bonsai tree that grows with user progress
 export function BonsaiTree() {
@@ -23,7 +24,7 @@ export function BonsaiTree() {
       {treeStage >= 1 && (
         <>
           <div className="border rounded-full">
-            <img src={treeChoice} alt="" />
+            <Image width={641} height={641} src={treeChoice} alt="BonsaiTree" />
           </div>
         </>
       )}
