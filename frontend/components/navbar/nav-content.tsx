@@ -7,7 +7,7 @@ import { SignOutButton } from '@/components/sign-out';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
-type Props = {}
+type Props = {};
 
 const navItems = [
   { href: '/chat', label: 'AI Assistant' },
@@ -15,14 +15,16 @@ const navItems = [
   { href: '/achievements', label: 'Achievements' },
 ];
 
-
 const NavContent = (props: Props) => {
   return (
     <header className="border-b bg-white/80 backdrop-blur-sm">
       <PageContainer>
         <div className="flex h-16 items-center justify-between">
           <Link href="/">
-            <span className="text-xl font-bold text-purple-700">MindGarden</span>
+            <span className="flex flex-row text-xl font-bold text-purple-700">
+              <img src="/Logo.png" alt="" className="w-8 h-8 mr-2" />
+              MindGarden
+            </span>
           </Link>
           <nav className="hidden items-center gap-4 md:flex">
             <DailyCheckIn />
@@ -59,7 +61,7 @@ const NavContent = (props: Props) => {
         </div>
       </PageContainer>
     </header>
-  )
-}
+  );
+};
 
-export default NavContent
+export default NavContent;
