@@ -1,7 +1,5 @@
 # 🌱 MindGarden: Your AI-Powered Mental Wellness Companion
 
-## 📌 Project Pitch
-
 ### 👥 Team Members
 - **Elhan Mahmutović**
 - **Mirza Abdulahović**
