@@ -28,29 +28,5 @@ MindGarden is a cutting-edge mental wellness platform that combines **AI-powered
 |---------|---------|---------|---------|
 | ![Bonsai Level 1](./frontend/public/BonsaiLevel1.gif) | ![Bonsai Level 2](./frontend/public/BonsaiLevel2.gif) | ![Bonsai Level 3](./frontend/public/BonsaiLevel3.gif) | ![Bonsai Level 4](./frontend/public/BonsaiLevel4.gif) |
 
-## 💻 Technology Stack & Implementation
-
-### 🎨 Frontend:
-- **Framework**: Next.js (Fast performance & SEO benefits)
-- **Styling**: Tailwind CSS + Shadcn UI (Modern and responsive UI design)
-- **Language**: TypeScript (Type safety & maintainability)
-- **State Management**: Zustand (Lightweight & efficient state handling)
-- **Data Fetching**: React Query (Optimized API requests)
-- **Authentication**: NextAuth.js + PostgreSQL adapter (Secure user authentication)
-
-### 🛠️ Backend:
-- **Server**: Express.js (Robust API handling & business logic)
-- **Database**: PostgreSQL (Storing user check-ins, achievements, and AI interactions)
-- **ORM**: TypeORM (Structured & efficient database management)
-- **Language**: TypeScript (Reliability & clarity in development)
-- **AI Integration**: OpenAI API (Intelligent chatbot support for mental wellness)
-
-### ☁️ Infrastructure & Deployment:
-- **Hosting**: AWS EC2 (Scalable server hosting)
-- **Database**: AWS RDS (Managed PostgreSQL instance for reliability)
-- **Domain Management**: GoDaddy + AWS Elastic IP (Stable and secure domain setup)
-- **CI/CD**: GitHub Actions (Automated deployment)
-- **Containerization**: Docker (Ensuring portability and scalability)
-
 ## 🎉 Join the MindGarden Movement!
 MindGarden makes mental self-care **simple, engaging, and rewarding**. Let’s cultivate a **happier, healthier mind**—one check-in at a time. 🌱💙
