@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { SessionGuard } from '@/components/auth/session-guard';
+import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <p className="text-center text-sm text-gray-500">
                     MindGarden - Nurture your mental wellness journey
                   </p>
+                  <Toaster />
                 </PageContainer>
               </footer>
             </div>

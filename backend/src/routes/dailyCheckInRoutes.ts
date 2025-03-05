@@ -1,8 +1,12 @@
-import { Router } from 'express';
-import { createDailyCheckIn } from '../controllers/dailyCheckInController';
+import express from 'express';
+import { createDailyCheckIn, getDailyCheckIn } from '../controllers/dailyCheckInController';
 
-const router = Router();
+const router = express.Router(); // Create the router instance
 
 router.post('/', createDailyCheckIn);
+console.log('getDailyCheckin function:', getDailyCheckIn);
+router.get('/', getDailyCheckIn);
+// router.get('/', getDailyCheckIn);
+// router.get('/', getDailyCheckIn);
 
 export default router;
