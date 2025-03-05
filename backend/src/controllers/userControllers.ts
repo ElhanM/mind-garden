@@ -1,27 +1,23 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { User } from '../entities/User';
+import { throwError, sendSuccess } from '../utils/responseHandlers';
 
 export const getUserByEmail = async (req: Request, res: Response): Promise<void> => {
-  const userEmail = req.headers['user-email']; // Extract from headers
+  const userEmail = Array.isArray(req.headers['user-email'])
+    ? req.headers['user-email'][0]
+    : req.headers['user-email']; // force array to string
 
   if (!userEmail || typeof userEmail !== 'string') {
-    res.status(400).json({ error: 'User email is required' });
-    return; // Exit function to avoid further execution
+    throwError('User email is required', 400);
   }
 
-  try {
-    const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOne({ where: { email: userEmail } });
+  const userRepository = AppDataSource.getRepository(User);
+  const user = await userRepository.findOne({ where: { email: userEmail } });
 
-    if (!user) {
-      res.status(404).json({ error: 'User not found' });
-      return; // Ensure function stops here
-    }
-
-    res.json({ userId: user.id }); // Send response properly
-  } catch (error) {
-    console.error('Error fetching user:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+  if (!user) {
+    throwError('User not found', 404);
   }
+
+  sendSuccess(res, { userId: user?.id }, 200);
 };
