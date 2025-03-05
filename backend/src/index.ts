@@ -6,6 +6,7 @@ import { errorHandler } from './middleware/errorMiddleware';
 import { AppDataSource } from './data-source';
 // Import your routes
 import dailyCheckInRoutes from './routes/dailyCheckInRoutes';
+import userRoutes from './routes/userRoutes';
 
 // Initialize database connection
 AppDataSource.initialize()
@@ -26,6 +27,7 @@ app.use(express.json());
 // Routes
 app.use('/api/check-ins', dailyCheckInRoutes);
 // Add other routes here
+app.use('/api/users', userRoutes);
 
 // Error handler - MUST be after all routes and middleware
 app.use(errorHandler);
