@@ -1,0 +1,53 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  dependency-check:
+    name: Check Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.13.1"
+          cache: "npm"
+      
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Check for lock file changes
+        run: |
+          if git diff --name-only | grep -q "package-lock.json"; then
+            echo "::error::package-lock.json was modified during install. Please commit the updated lock file."
+            exit 1
+          fi
+  
+  prettier-check:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.13.1"
+          cache: "npm"
+      
+      - name: Install Dependencies
+        run: npm install
+      
+      - name: Check Frontend Formatting
+        run: |
+          cd frontend
+          npm run format:check
+      
+      - name: Check Backend Formatting
+        run: |
+          cd backend
+          npm run format:check
