@@ -49,7 +49,7 @@ MindGarden is a cutting-edge mental wellness platform that combines **AI-powered
 - **Hosting**: AWS EC2 (Scalable server hosting)
 - **Database**: AWS RDS (Managed PostgreSQL instance for reliability)
 - **Domain Management**: GoDaddy + AWS Elastic IP (Stable and secure domain setup)
-- **CI/CD**: GitHub Actions (Automated deployment and version control)
+- **CI/CD**: GitHub Actions (Automated deployment)
 - **Containerization**: Docker (Ensuring portability and scalability)
 
 ## 🎉 Join the MindGarden Movement!
