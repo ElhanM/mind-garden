@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import { toast, useToast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -23,73 +23,14 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import {
-  CheckCircle,
-  Calendar,
-  Sun,
-  CloudSun,
-  Cloud,
-  CloudRain,
-  CloudLightning,
-} from 'lucide-react';
-import { z } from 'zod';
+import { Calendar, Sun, CloudSun, Cloud, CloudRain, CloudLightning } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-
-// Define the schema for form validation
-const checkInSchema = z.object({
-  mood: z.enum(['great', 'good', 'okay', 'down', 'bad'], {
-    required_error: 'Please select your mood',
-  }),
-  stressLevel: z
-    .number()
-    .min(1, 'Stress level must be at least 1')
-    .max(5, 'Stress level must be at most 5'),
-  journalEntry: z.string().optional(),
-});
-
-type CheckInFormData = z.infer<typeof checkInSchema>;
-
-// Create axios instance with interceptor to add user email to every request
-const api = axios.create();
-
-// Function to check if user has already checked in today
-const fetchTodayCheckIn = async (userId: number | null) => {
-  if (!userId) return null; // Avoid making the request if no userId
-
-  try {
-    const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/api/check-ins`, {
-      headers: {
-        'user-id': userId, // Make sure userId is sent here
-      },
-    });
-    console.log('API Response:', response.data);
-
-    return response.data.data;
-  } catch (error) {
-    // If 404, it means no check-in for today, which is fine
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return null;
-    }
-    throw error;
-  }
-};
-
-// Function to submit a new check-in
-const submitCheckIn = async (data: CheckInFormData & { userId: number }) => {
-  console.log('Making API request with data:', data);
-
-  try {
-    const response = await api.post(`${process.env.NEXT_PUBLIC_API_URL}/api/check-ins`, data);
-    console.log('API response:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('API request failed:', error);
-    throw error;
-  }
-};
+import api from './axios-config';
+import { fetchTodayCheckIn, submitCheckIn } from './api-functions';
+import type { CheckInFormData } from './check-in-schema';
+import { checkInSchema } from './check-in-schema';
 
 export function DailyCheckIn() {
   const [open, setOpen] = useState(false);
@@ -98,28 +39,15 @@ export function DailyCheckIn() {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 
-  // Set up axios interceptor to add user email to every request
-  api.interceptors.request.use((config) => {
-    if (session?.user?.email) {
-      config.headers = config.headers || {};
-      config.headers['user-email'] = session.user.email;
-    }
-    return config;
-  });
-
   useEffect(() => {
     const fetchUserId = async () => {
       if (!session?.user?.email) return;
 
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/me`, {
-          headers: { 'user-email': session.user.email },
-        });
-
-        console.log('Fetched user ID:', response.data.userId);
-        setUserId(response.data.userId);
+        const response = await api.get('/api/users/me');
+        setUserId(response.data.results.userId);
       } catch (error) {
-        console.error('Failed to fetch user ID:', error);
+        throw error;
       }
     };
 
@@ -129,8 +57,8 @@ export function DailyCheckIn() {
   // Query to check if user already checked in today
   const { data: todayCheckIn, isLoading: checkInLoading } = useQuery({
     queryKey: ['todayCheckIn', userId],
-    queryFn: () => fetchTodayCheckIn(userId as number | null),
-    enabled: !!userId, // Only run if userId exists
+    queryFn: () => (userId ? fetchTodayCheckIn(userId) : Promise.resolve(null)),
+    enabled: !!userId, // Only fetch if userId exists
     retry: false,
   });
 
@@ -155,23 +83,16 @@ export function DailyCheckIn() {
   const checkInMutation = useMutation({
     mutationFn: submitCheckIn,
     onSuccess: () => {
-      console.log('Check-in submitted successfully');
       toast({
         title: 'Success!',
         description: 'Check-in submitted successfully.',
         variant: 'default',
       });
-      setIsSubmitted(true);
       queryClient.invalidateQueries({ queryKey: ['todayCheckIn'] });
-
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setOpen(false);
-        reset();
-      }, 2000);
+      setOpen(false); // Close the dialog immediately
+      reset(); // Reset the form
     },
     onError: (error) => {
-      console.error('Error submitting check-in:', error);
       toast({
         title: 'Nope!',
         description: 'An error occured.',
@@ -180,25 +101,16 @@ export function DailyCheckIn() {
     },
   });
 
-  const testSuccessToast = () => {
-    toast({
-      title: 'Success!',
-      description: 'Check-in submitted successfully.',
-      variant: 'default',
-    });
-  };
-
   //hndle form submission
   const onSubmit = (data: CheckInFormData) => {
-    console.log('Form submitted with data:', data);
-    console.log('Session data:', session);
-
     if (!userId) {
-      console.error('No user ID found');
+      toast({
+        title: 'No user id found!',
+        description: 'Please try again.',
+        variant: 'destructive',
+      });
       return;
     }
-
-    console.log('Submitting check-in with userId:', userId);
     //add the userId to  data
     checkInMutation.mutate({ ...data, userId });
   };
@@ -211,11 +123,11 @@ export function DailyCheckIn() {
           disabled={!userId || checkInLoading || hasCheckedInToday} // Disable if userId is null or data is loading
         >
           <Calendar className="mr-2 h-4 w-4" />
-          {hasCheckedInToday ? 'Already Checked In Today' : 'Daily Check-in'}
+          Daily Check-in
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        {!isSubmitted ? (
+        {!isSubmitted && (
           <>
             <DialogHeader>
               <DialogTitle>Daily Mental Health Check-in</DialogTitle>
@@ -322,11 +234,6 @@ export function DailyCheckIn() {
               </DialogFooter>
             </form>
           </>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-4">
-            <CheckCircle className="h-12 w-12 text-green-500" />
-            <p className="mt-2 text-lg font-semibold text-gray-700">Check-in submitted!</p>
-          </div>
         )}
       </DialogContent>
     </Dialog>
