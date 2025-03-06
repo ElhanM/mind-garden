@@ -20,17 +20,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Spinner } from './ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { Calendar, Sun, CloudSun, Cloud, CloudRain, CloudLightning } from 'lucide-react';
+import {
+  Calendar,
+  Sun,
+  CloudSun,
+  Cloud,
+  CloudRain,
+  CloudLightning,
+  SendHorizontal,
+  SendHorizonal,
+} from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from './axios-config';
-import { fetchTodayCheckIn, submitCheckIn } from './api-functions';
-import type { CheckInFormData } from './check-in-schema';
-import { checkInSchema } from './check-in-schema';
+import api from '../app/api-client/axios-config';
+import { fetchTodayCheckIn, submitCheckIn } from '../app/api-client/check-in';
+import type { CheckInFormData } from '../validation/check-in-schema';
+import { checkInSchema } from '../validation/check-in-schema';
 
 export function DailyCheckIn() {
   const [open, setOpen] = useState(false);
@@ -38,6 +48,7 @@ export function DailyCheckIn() {
   const [userId, setUserId] = useState<number | null>(null);
   const { data: session } = useSession();
   const queryClient = useQueryClient();
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -91,6 +102,7 @@ export function DailyCheckIn() {
       queryClient.invalidateQueries({ queryKey: ['todayCheckIn'] });
       setOpen(false); // Close the dialog immediately
       reset(); // Reset the form
+      setSubmitting(false);
     },
     onError: (error) => {
       toast({
@@ -98,10 +110,12 @@ export function DailyCheckIn() {
         description: 'An error occured.',
         variant: 'destructive',
       });
+      setSubmitting(false);
+      throw error;
     },
   });
 
-  //hndle form submission
+  // Handle form submission
   const onSubmit = (data: CheckInFormData) => {
     if (!userId) {
       toast({
@@ -111,7 +125,8 @@ export function DailyCheckIn() {
       });
       return;
     }
-    //add the userId to  data
+    setSubmitting(true);
+    // Add the userId to data
     checkInMutation.mutate({ ...data, userId });
   };
 
@@ -122,8 +137,17 @@ export function DailyCheckIn() {
           className="bg-purple-600 hover:bg-purple-700"
           disabled={!userId || checkInLoading || hasCheckedInToday} // Disable if userId is null or data is loading
         >
-          <Calendar className="mr-2 h-4 w-4" />
-          Daily Check-in
+          {checkInLoading || !userId ? (
+            <>
+              <Spinner className="text-gray-50 mr-2 h-4 w-4" />
+              Daily Check-in
+            </>
+          ) : (
+            <>
+              <Calendar className="mr-2 h-4 w-4" />
+              Daily Check-in
+            </>
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -227,9 +251,18 @@ export function DailyCheckIn() {
                 <Button
                   type="submit"
                   className="bg-purple-600 hover:bg-purple-700"
-                  disabled={isSubmitting}
+                  disabled={submitting}
                 >
-                  {isSubmitting ? 'Submitting...' : 'Submit'}
+                  {submitting ? (
+                    <>
+                      <Spinner className="text-gray-50 mr-2 h-4 w-4" /> Check-in
+                    </>
+                  ) : (
+                    <>
+                      <SendHorizonal className="h-4 w-4 mr-2" />
+                      Check-in
+                    </>
+                  )}
                 </Button>
               </DialogFooter>
             </form>

@@ -4,11 +4,9 @@ import { User } from '../entities/User';
 import { throwError, sendSuccess } from '../utils/responseHandlers';
 
 export const getUserByEmail = async (req: Request, res: Response): Promise<void> => {
-  const userEmail = Array.isArray(req.headers['user-email'])
-    ? req.headers['user-email'][0]
-    : req.headers['user-email']; // force array to string
+  const userEmail = req.headers['user-email'] as string;
 
-  if (!userEmail || typeof userEmail !== 'string') {
+  if (!userEmail) {
     throwError('User email is required', 400);
   }
 

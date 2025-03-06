@@ -1,6 +1,13 @@
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
 
+// env guard
+if (!process.env.NEXT_PUBLIC_API_URL) {
+  throw new Error(
+    'NEXT_PUBLIC_API_URL is not defined. Please set it in your environment variables.'
+  );
+}
+
 // Create an Axios instance
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL, // Ensure base URL is set
@@ -14,6 +21,7 @@ api.interceptors.request.use(
       config.headers = config.headers || {};
       config.headers['user-email'] = session.user.email;
     }
+
     return config;
   },
   (error) => Promise.reject(error)
