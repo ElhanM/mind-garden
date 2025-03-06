@@ -20,19 +20,20 @@ export function BonsaiTree() {
   }, []);
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center">
-      {treeStage >= 1 && (
-        <>
-          <div className="border rounded-full">
-            <Image width={641} height={641} src={treeChoice} alt="BonsaiTree" />
-          </div>
-        </>
-      )}
-
+    <>
+      <div className="flex h-full w-full flex-col items-center justify-center">
+        {treeStage >= 1 && (
+          <>
+            <div className="border rounded-full">
+              <Image width={641} height={641} src={treeChoice} alt="BonsaiTree" />
+            </div>
+          </>
+        )}
+      </div>
       {/* Last watered info */}
-      <div className="absolute bottom-0 mt-4 text-center text-sm text-gray-600">
+      <div className="bottom-0 mt-0 text-center text-sm text-gray-600">
         <p>Last check-in: {lastWatered ? lastWatered.toLocaleDateString() : 'Never'}</p>
       </div>
-    </div>
+    </>
   );
 }

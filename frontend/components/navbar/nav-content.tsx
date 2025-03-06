@@ -11,6 +11,7 @@ import Image from 'next/image';
 type Props = {};
 
 const navItems = [
+  { href: '/home', label: 'Home' },
   { href: '/chat', label: 'AI Assistant' },
   { href: '/profile', label: 'Profile' },
   { href: '/achievements', label: 'Achievements' },
