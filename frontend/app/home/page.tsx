@@ -9,7 +9,7 @@ export default function Home() {
     <PageLayout>
       <div className="grid gap-8 md:grid-cols-2">
         <section className="flex flex-col items-center justify-center">
-          <div className="relative h-[300px] w-full max-w-md md:h-[400px]">
+          <div className="h-[300px] w-full max-w-md md:h-[400px]">
             <BonsaiTree />
           </div>
         </section>
