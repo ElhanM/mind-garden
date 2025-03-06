@@ -54,12 +54,8 @@ export function DailyCheckIn() {
     const fetchUserId = async () => {
       if (!session?.user?.email) return;
 
-      try {
-        const response = await api.get('/api/users/me');
-        setUserId(response.data.results.userId);
-      } catch (error) {
-        throw error;
-      }
+      const response = await api.get('/api/users/me');
+      setUserId(response.data.results.userId);
     };
 
     fetchUserId();
