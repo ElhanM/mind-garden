@@ -58,16 +58,29 @@ export function DailyCheckIn() {
       setUserId(response.data.results.userId);
     };
 
-    fetchUserId();
+    fetchUserId().catch((error) =>
+      console.error(
+        `Failed to fetch user ID: ${error.response?.status} - ${error.response?.data?.message || error.message}`
+      )
+    );
   }, [session]);
 
   // Query to check if user already checked in today
-  const { data: todayCheckIn, isLoading: checkInLoading } = useQuery({
+  const {
+    data: todayCheckIn,
+    isLoading: checkInLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ['todayCheckIn', userId],
     queryFn: () => (userId ? fetchTodayCheckIn(userId) : Promise.resolve(null)),
     enabled: !!userId, // Only fetch if userId exists
     retry: false,
   });
+
+  if (isError) {
+    console.error('React Query Error:', error);
+  }
 
   const hasCheckedInToday = !!todayCheckIn;
 
