@@ -7,13 +7,16 @@ const api = axios.create({
 });
 
 // Attach request interceptor to include user email
-api.interceptors.request.use(async (config) => {
-  const session = await getSession(); // Get session for user info
-  if (session?.user?.email) {
-    config.headers = config.headers || {};
-    config.headers['user-email'] = session.user.email;
-  }
-  return config;
-}, (error) => Promise.reject(error));
+api.interceptors.request.use(
+  async (config) => {
+    const session = await getSession(); // Get session for user info
+    if (session?.user?.email) {
+      config.headers = config.headers || {};
+      config.headers['user-email'] = session.user.email;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default api;

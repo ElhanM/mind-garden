@@ -10,7 +10,7 @@ export const fetchTodayCheckIn = async (userId: number | null) => {
     const response = await api.get(`/api/check-ins`, {
       headers: { 'user-id': userId },
     });
-    return response.data.results; 
+    return response.data.results;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       return null;
