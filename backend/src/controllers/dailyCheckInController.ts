@@ -62,7 +62,7 @@ export const getDailyCheckIn = async (req: Request, res: Response) => {
   const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
 
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // set to midnight
+  today.setHours(0, 0, 0, 0); // set to midnight (this will make the comparison between checkInDate and current date possible)
 
   const todayCheckIn = await dailyCheckInRepository.findOne({
     // see if they checked in today
