@@ -2,18 +2,24 @@ import api from '../axios-config';
 import type { CheckInFormData } from '../../../validation/check-in-schema';
 
 // Function to check if user has already checked in today
-export const fetchTodayCheckIn = async (userId: number | null) => {
-  if (!userId) return null;
+export const fetchTodayCheckIn = async (email: string | null) => {
+  if (!email) return null;
 
   const response = await api.get(`/api/check-ins`, {
-    headers: { 'user-id': userId },
+    headers: { 'user-email': email }, // Correcting the header
   });
 
   return response.data.results;
 };
 
-// Function to submit a new check-in
-export const submitCheckIn = async (data: CheckInFormData & { userId: number }) => {
-  const response = await api.post(`/api/check-ins`, data);
+export const submitCheckIn = async (data: CheckInFormData, email: string) => {
+  const response = await api.post(
+    `/api/check-ins`,
+    { ...data }, // Email is removed from body
+    {
+      headers: { 'user-email': email }, // Email is now in headers
+    }
+  );
+
   return response.data.results;
 };

@@ -6,8 +6,6 @@ import { errorHandler } from './middleware/errorMiddleware';
 import { AppDataSource } from './data-source';
 // Import your routes
 import dailyCheckInRoutes from './routes/dailyCheckInRoutes';
-import userRoutes from './routes/userRoutes';
-
 // Initialize database connection
 AppDataSource.initialize()
   .then(() => {

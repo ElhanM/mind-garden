@@ -45,25 +45,10 @@ import { checkInSchema } from '../validation/check-in-schema';
 export function DailyCheckIn() {
   const [open, setOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [userId, setUserId] = useState<number | null>(null);
   const { data: session } = useSession();
   const queryClient = useQueryClient();
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    const fetchUserId = async () => {
-      if (!session?.user?.email) return;
-
-      const response = await api.get('/api/users/me');
-      setUserId(response.data.results.userId);
-    };
-
-    fetchUserId().catch((error) =>
-      console.error(
-        `Failed to fetch user ID: ${error.response?.status} - ${error.response?.data?.message || error.message}`
-      )
-    );
-  }, [session]);
+  const email = session?.user.email ?? '';
 
   // Query to check if user already checked in today
   const {
@@ -72,9 +57,9 @@ export function DailyCheckIn() {
     isError,
     error,
   } = useQuery({
-    queryKey: ['todayCheckIn', userId],
-    queryFn: () => (userId ? fetchTodayCheckIn(userId) : Promise.resolve(null)),
-    enabled: !!userId, // Only fetch if userId exists
+    queryKey: ['todayCheckIn'],
+    queryFn: () => (email ? fetchTodayCheckIn(email) : Promise.resolve(null)),
+    enabled: !!email, // Only fetch if userId exists
     retry: false,
   });
 
@@ -101,7 +86,10 @@ export function DailyCheckIn() {
 
   // Mutation for submitting check-in
   const checkInMutation = useMutation({
-    mutationFn: submitCheckIn,
+    mutationFn: (formData: CheckInFormData) => {
+      if (!email) throw new Error('User email is required');
+      return submitCheckIn(formData, email);
+    },
     onSuccess: () => {
       toast({
         title: 'Success!',
@@ -116,7 +104,7 @@ export function DailyCheckIn() {
     onError: (error) => {
       toast({
         title: 'Nope!',
-        description: 'An error occured.',
+        description: 'An error occurred.',
         variant: 'destructive',
       });
       setSubmitting(false);
@@ -126,17 +114,16 @@ export function DailyCheckIn() {
 
   // Handle form submission
   const onSubmit = (data: CheckInFormData) => {
-    if (!userId) {
+    if (!email) {
       toast({
-        title: 'No user id found!',
+        title: 'No user email found!',
         description: 'Please try again.',
         variant: 'destructive',
       });
       return;
     }
     setSubmitting(true);
-    // Add the userId to data
-    checkInMutation.mutate({ ...data, userId });
+    checkInMutation.mutate(data); // ✅ Now only passing data
   };
 
   return (
@@ -144,9 +131,9 @@ export function DailyCheckIn() {
       <DialogTrigger asChild>
         <Button
           className="bg-purple-600 hover:bg-purple-700"
-          disabled={!userId || checkInLoading || hasCheckedInToday} // Disable if userId is null or data is loading
+          disabled={!email || checkInLoading || hasCheckedInToday} // Disable if userId is null or data is loading
         >
-          {checkInLoading || !userId ? (
+          {checkInLoading || !email ? (
             <>
               <Spinner className="text-gray-50 mr-2 h-4 w-4" />
               Daily Check-in

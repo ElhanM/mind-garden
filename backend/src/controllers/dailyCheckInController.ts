@@ -7,9 +7,10 @@ import { sendSuccess } from '../utils/responseHandlers';
 import { getUserByEmail } from '../utils/idHandler';
 
 export const createDailyCheckIn = async (req: Request, res: Response) => {
-  const { userId, mood, stressLevel, journalEntry } = req.body;
+  const { mood, stressLevel, journalEntry } = req.body;
+  const userEmail = req.headers['user-email'] as string;
 
-  if (!userId || !mood || !stressLevel) {
+  if (!userEmail || !mood || !stressLevel) {
     throwError('Missing required fields', 400);
   }
 
@@ -23,6 +24,10 @@ export const createDailyCheckIn = async (req: Request, res: Response) => {
   if (stressLevel < 1 || stressLevel > 5) {
     throwError('Stress level must be between 1 and 5', 400);
   }
+
+  //addition: user id is now retrieved here on backend to remove the useEffect on front-end that we really didnt need
+  const user = await getUserByEmail(userEmail);
+  const userId = user?.id;
 
   const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
 
