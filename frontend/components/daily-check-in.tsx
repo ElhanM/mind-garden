@@ -37,10 +37,10 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../app/api-client/axios-config';
 import { fetchTodayCheckIn, submitCheckIn } from '../app/api-client/check-in';
 import type { CheckInFormData } from '../validation/check-in-schema';
 import { checkInSchema } from '../validation/check-in-schema';
+import { AxiosError } from 'axios';
 
 export function DailyCheckIn() {
   const [open, setOpen] = useState(false);
@@ -63,8 +63,21 @@ export function DailyCheckIn() {
     retry: false,
   });
 
+  //same structure as the onError.
   if (isError) {
-    console.error('React Query Error:', error);
+    let errorMessage = 'An unknown error occurred';
+
+    if (error instanceof AxiosError) {
+      errorMessage = error.response?.data?.message || 'A server error occurred';
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    toast({
+      title: 'Error!',
+      description: errorMessage,
+      variant: 'destructive',
+    });
   }
 
   const hasCheckedInToday = !!todayCheckIn;
@@ -101,14 +114,24 @@ export function DailyCheckIn() {
       reset(); // Reset the form
       setSubmitting(false);
     },
-    onError: (error) => {
+    onError: (error: unknown) => {
+      //default message, probably won't ever render
+      let errorMessage = 'An unknown error occurred';
+
+      //handles two cases, both AxiosError and regular one bcs both might appear
+      if (error instanceof AxiosError) {
+        errorMessage = error.response?.data?.message || 'A server error occurred';
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: 'Nope!',
-        description: 'An error occurred.',
+        description: errorMessage,
         variant: 'destructive',
       });
+
       setSubmitting(false);
-      throw error;
     },
   });
 

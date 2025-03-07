@@ -60,6 +60,11 @@ export const createDailyCheckIn = async (req: Request, res: Response) => {
 
 export const getDailyCheckIn = async (req: Request, res: Response) => {
   const userEmail = req.headers['user-email'] as string;
+
+  if (!userEmail) {
+    throwError('Missing email. Log in!', 400);
+  }
+
   const user = await getUserByEmail(userEmail);
   const userId = user?.id;
 

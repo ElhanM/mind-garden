@@ -9,17 +9,25 @@ export const fetchTodayCheckIn = async (email: string | null) => {
     headers: { 'user-email': email }, // Correcting the header
   });
 
+  if (response.data.success === null) {
+    throw new Error(response.data.message);
+  }
+
   return response.data.results;
 };
 
 export const submitCheckIn = async (data: CheckInFormData, email: string) => {
   const response = await api.post(
     `/api/check-ins`,
-    { ...data }, // Email is removed from body
+    { ...data },
     {
       headers: { 'user-email': email }, // Email is now in headers
     }
   );
+
+  if (response.data.success === false) {
+    throw new Error(response.data.message);
+  }
 
   return response.data.results;
 };
