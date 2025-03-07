@@ -47,7 +47,7 @@ export const achievements = [
     id: 6,
     title: 'Communication Expert',
     description: 'Communicate with our mental wellness assistant for 10 days in a row',
-    icon: <Bot className="h-6 w-6 text-red-500" />,
+    icon: <Bot className="h-6 w-6 text-indigo-500" />,
     unlocked: false,
     date: null,
   },
