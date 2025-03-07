@@ -4,6 +4,7 @@ import { AppDataSource } from '../data-source';
 import { DailyCheckIn } from '../entities/DailyCheckIn';
 import { throwError } from '../utils/responseHandlers';
 import { sendSuccess } from '../utils/responseHandlers';
+import { send } from 'process';
 
 export const createDailyCheckIn = async (req: Request, res: Response) => {
   const { userId, mood, stressLevel, journalEntry } = req.body;
@@ -71,10 +72,6 @@ export const getDailyCheckIn = async (req: Request, res: Response) => {
       checkInDate: today,
     },
   });
-
-  if (!todayCheckIn) {
-    throwError('No check-in found for today', 404);
-  }
 
   sendSuccess(res, todayCheckIn, 200);
 };
