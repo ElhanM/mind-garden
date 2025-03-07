@@ -11,6 +11,11 @@ export default function ProfilePage() {
   const { data: session, status } = useSession();
   const isLoading = status === 'loading';
 
+  // Used to get high quality profile image
+  const profileImage = session?.user.image
+    ? session.user.image.split('=')[0] // Remove size constraints from Google URL
+    : '/Logo.png';
+
   return (
     <PageLayout>
       <div className="grid gap-6 md:grid-cols-2 items-stretch">
@@ -21,11 +26,13 @@ export default function ProfilePage() {
                 <Skeleton className="h-[145px] w-[145px] rounded-full" />
               ) : (
                 <Image
-                  src={session?.user.image || '/Logo.png'}
+                  src={profileImage}
                   alt="Profile Picture"
                   width={145}
                   height={145}
+                  quality={100}
                   className="rounded-full"
+                  priority
                 />
               )}
             </div>

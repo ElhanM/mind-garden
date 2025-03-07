@@ -23,7 +23,7 @@ export function AchievementsList() {
                 <h3 className="font-medium text-gray-900">{achievement.title}</h3>
                 <p className="text-sm text-gray-500">{achievement.description}</p>
               </div>
-              {achievement.unlocked && (
+              {achievement.unlocked && achievement.date && (
                 <div className="text-xs text-gray-500">
                   {new Date(achievement.date).toLocaleDateString()}
                 </div>
@@ -31,9 +31,11 @@ export function AchievementsList() {
             </div>
           ))}
           <div className="text-center">
-            <Button variant="link" className="text-purple-600 hover:text-purple-700">
-              View All Achievements
-            </Button>
+            <Link href="/achievements">
+              <Button variant="link" className="text-purple-600 hover:text-purple-700">
+                View All Achievements
+              </Button>
+            </Link>
           </div>
         </div>
       </CardContent>
@@ -43,3 +45,4 @@ export function AchievementsList() {
 
 import { Button } from '@/components/ui/button';
 import { achievements } from '@/app/achievements/page';
+import Link from 'next/link';

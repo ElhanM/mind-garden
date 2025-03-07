@@ -1,6 +1,6 @@
 import { PageLayout } from '@/components/page-layout';
 import { CardWithTitle } from '@/components/ui/card-with-title';
-import { Award, Trophy, Star, Zap, Heart } from 'lucide-react';
+import { Award, Trophy, Star, Zap, Heart, Bot } from 'lucide-react';
 
 export const achievements = [
   {
@@ -40,6 +40,14 @@ export const achievements = [
     title: 'Self-Care Champion',
     description: 'Report 5 consecutive days of positive mood',
     icon: <Heart className="h-6 w-6 text-red-500" />,
+    unlocked: false,
+    date: null,
+  },
+  {
+    id: 6,
+    title: 'Communication Expert',
+    description: 'Communicate with our mental wellness assistant for 10 days in a row',
+    icon: <Bot className="h-6 w-6 text-red-500" />,
     unlocked: false,
     date: null,
   },
