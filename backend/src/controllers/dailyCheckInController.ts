@@ -4,7 +4,7 @@ import { AppDataSource } from '../data-source';
 import { DailyCheckIn } from '../entities/DailyCheckIn';
 import { throwError } from '../utils/responseHandlers';
 import { sendSuccess } from '../utils/responseHandlers';
-import { send } from 'process';
+import { getUserByEmail } from '../utils/idHandler';
 
 export const createDailyCheckIn = async (req: Request, res: Response) => {
   const { userId, mood, stressLevel, journalEntry } = req.body;
@@ -54,11 +54,9 @@ export const createDailyCheckIn = async (req: Request, res: Response) => {
 };
 
 export const getDailyCheckIn = async (req: Request, res: Response) => {
-  const userId = Number(req.headers['user-id']); // obtain userId from headers
-
-  if (!userId) {
-    throwError('User ID is required', 400);
-  }
+  const userEmail = req.headers['user-email'] as string;
+  const user = await getUserByEmail(userEmail);
+  const userId = user?.id;
 
   const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
 

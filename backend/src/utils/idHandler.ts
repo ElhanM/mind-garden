@@ -1,11 +1,8 @@
-import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { User } from '../entities/User';
-import { throwError, sendSuccess } from '../utils/responseHandlers';
+import { throwError } from './responseHandlers';
 
-export const getUserByEmail = async (req: Request, res: Response): Promise<void> => {
-  const userEmail = req.headers['user-email'] as string;
-
+export const getUserByEmail = async (userEmail: string) => {
   if (!userEmail) {
     throwError('User email is required', 400);
   }
@@ -17,5 +14,5 @@ export const getUserByEmail = async (req: Request, res: Response): Promise<void>
     throwError('User not found', 404);
   }
 
-  sendSuccess(res, { userId: user?.id }, 200);
+  return user;
 };

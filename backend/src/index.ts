@@ -27,7 +27,6 @@ app.use(express.json());
 // Routes
 app.use('/api/check-ins', dailyCheckInRoutes);
 // Add other routes here
-app.use('/api/users', userRoutes);
 
 // Error handler - MUST be after all routes and middleware
 app.use(errorHandler);

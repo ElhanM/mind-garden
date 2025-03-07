@@ -1,8 +1,6 @@
 import { Router } from 'express';
-import { getUserByEmail } from '../controllers/userControllers';
+import { getUserByEmail } from '../utils/idHandler';
 
 const router = Router();
-
-router.get('/me', getUserByEmail); // to get id from session mail
 
 export default router;
