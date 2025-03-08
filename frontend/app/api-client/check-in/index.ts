@@ -9,7 +9,7 @@ export const fetchTodayCheckIn = async (email: string | null) => {
     headers: { 'user-email': email }, // Correcting the header
   });
 
-  if (response.data.success === null) {
+  if (response.data.success !== true) {
     throw new Error(response.data.message);
   }
 
@@ -25,7 +25,7 @@ export const submitCheckIn = async (data: CheckInFormData, email: string) => {
     }
   );
 
-  if (response.data.success === false) {
+  if (response.data.success !== true) {
     throw new Error(response.data.message);
   }
 
