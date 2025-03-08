@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
@@ -31,7 +31,6 @@ import {
   Cloud,
   CloudRain,
   CloudLightning,
-  SendHorizontal,
   SendHorizonal,
 } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -40,7 +39,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchTodayCheckIn, submitCheckIn } from '../app/api-client/check-in';
 import type { CheckInFormData } from '../validation/check-in-schema';
 import { checkInSchema } from '../validation/check-in-schema';
-import { AxiosError } from 'axios';
+import errorCatch from '@/app/api-client/error-message';
 
 export function DailyCheckIn() {
   const [open, setOpen] = useState(false);
@@ -60,18 +59,11 @@ export function DailyCheckIn() {
     queryKey: ['todayCheckIn'],
     queryFn: () => (email ? fetchTodayCheckIn(email) : Promise.resolve(null)),
     enabled: !!email, // Only fetch if userId exists
-    retry: false,
   });
 
   //same structure as the onError.
   if (isError) {
-    let errorMessage = 'An unknown error occurred';
-
-    if (error instanceof AxiosError) {
-      errorMessage = error.response?.data?.message || 'A server error occurred';
-    } else if (error instanceof Error) {
-      errorMessage = error.message;
-    }
+    const errorMessage = errorCatch(error);
 
     toast({
       title: 'Error!',
@@ -114,16 +106,8 @@ export function DailyCheckIn() {
       reset(); // Reset the form
       setSubmitting(false);
     },
-    onError: (error: unknown) => {
-      //default message, probably won't ever render
-      let errorMessage = 'An unknown error occurred';
-
-      //handles two cases, both AxiosError and regular one bcs both might appear
-      if (error instanceof AxiosError) {
-        errorMessage = error.response?.data?.message || 'A server error occurred';
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+    onError: (error: Error) => {
+      const errorMessage = errorCatch(error);
 
       toast({
         title: 'Nope!',
@@ -146,7 +130,7 @@ export function DailyCheckIn() {
       return;
     }
     setSubmitting(true);
-    checkInMutation.mutate(data); // ✅ Now only passing data
+    checkInMutation.mutate(data);
   };
 
   return (

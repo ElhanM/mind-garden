@@ -35,7 +35,7 @@ export class DailyCheckIn {
   @Column({ name: 'journal_entry', nullable: true })
   journalEntry: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })
   createdAt: Date;
 
   @Column({ name: 'check_in_date', type: 'date', default: () => 'CURRENT_DATE' })
