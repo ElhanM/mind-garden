@@ -106,7 +106,7 @@ export function DailyCheckIn() {
       reset(); // Reset the form
       setSubmitting(false);
     },
-    onError: (error: Error) => {
+    onError: (error: unknown) => {
       const errorMessage = errorCatch(error);
 
       toast({

@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-const errorCatch = (error: Error) => {
+const errorCatch = (error: unknown) => {
   let errorMessage = 'An unknown error occurred';
 
   if (error instanceof AxiosError) {
