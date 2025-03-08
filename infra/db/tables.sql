@@ -54,7 +54,7 @@ CREATE TABLE daily_check_ins (
     mood VARCHAR(20) NOT NULL CHECK (mood IN ('great', 'good', 'okay', 'down', 'bad')),
     stress_level INTEGER NOT NULL CHECK (stress_level BETWEEN 1 AND 5),
     journal_entry TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     check_in_date DATE NOT NULL DEFAULT CURRENT_DATE,
     UNIQUE(user_id, check_in_date)
 );
