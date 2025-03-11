@@ -72,7 +72,9 @@ export function DailyCheckIn() {
     });
   }
 
-  const hasCheckedInToday = !!todayCheckIn;
+  const hasCheckedInToday = todayCheckIn
+    ? new Date(todayCheckIn.createdAt).setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0)
+    : false;
 
   // Form setup with validation
   const {

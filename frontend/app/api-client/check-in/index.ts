@@ -5,11 +5,8 @@ import type { CheckInFormData } from '../../../validation/check-in-schema';
 export const fetchTodayCheckIn = async (email: string | null) => {
   if (!email) return null;
 
-  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  console.log('User Time Zone:', userTimeZone);
-
   const response = await api.get(`/api/check-ins`, {
-    headers: { 'user-email': email, 'user-timezone': userTimeZone }, // Correcting the header
+    headers: { 'user-email': email }, // Correcting the header
   });
 
   if (response.data.success !== true) {
