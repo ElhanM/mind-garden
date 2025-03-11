@@ -40,6 +40,7 @@ import { fetchTodayCheckIn, submitCheckIn } from '../app/api-client/check-in';
 import type { CheckInFormData } from '../validation/check-in-schema';
 import { checkInSchema } from '../validation/check-in-schema';
 import errorCatch from '@/app/api-client/error-message';
+import compareDatesWithoutTimestamp from '@/validation/compare-dates-without-timestamp';
 
 export function DailyCheckIn() {
   const [open, setOpen] = useState(false);
@@ -72,11 +73,7 @@ export function DailyCheckIn() {
     });
   }
 
-  const hasCheckedInToday = todayCheckIn
-    ? new Date(todayCheckIn.createdAt).getFullYear() === new Date().getFullYear() &&
-      new Date(todayCheckIn.createdAt).getMonth() === new Date().getMonth() &&
-      new Date(todayCheckIn.createdAt).getDate() === new Date().getDate()
-    : false;
+  const hasCheckedInToday = compareDatesWithoutTimestamp(todayCheckIn);
 
   // Form setup with validation
   const {
