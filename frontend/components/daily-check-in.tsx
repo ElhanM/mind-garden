@@ -73,7 +73,9 @@ export function DailyCheckIn() {
   }
 
   const hasCheckedInToday = todayCheckIn
-    ? new Date(todayCheckIn.createdAt).setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0)
+    ? new Date(todayCheckIn.createdAt).getFullYear() === new Date().getFullYear() &&
+      new Date(todayCheckIn.createdAt).getMonth() === new Date().getMonth() &&
+      new Date(todayCheckIn.createdAt).getDate() === new Date().getDate()
     : false;
 
   // Form setup with validation
