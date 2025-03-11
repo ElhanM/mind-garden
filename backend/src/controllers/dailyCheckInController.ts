@@ -46,28 +46,22 @@ export const createDailyCheckIn = async (req: Request, res: Response) => {
 };
 
 export const getDailyCheckIn = async (req: Request, res: Response) => {
-  try {
-    const userEmail = req.headers['user-email'] as string;
-    if (!userEmail) {
-      throwError('Missing email. Log in!', 400);
-    }
-
-    const user = await getUserByEmail(userEmail);
-    const userId = user?.id;
-
-    const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
-
-    // Get the latest check-in
-    const todayCheckIn = await dailyCheckInRepository.findOne({
-      where: { userId },
-      order: { createdAt: 'DESC' },
-    });
-
-    console.log('Today Check-In:', todayCheckIn?.createdAt);
-
-    // Send the UTC timestamp directly
-    sendSuccess(res, todayCheckIn, 200);
-  } catch (error) {
-    throwError('Error getting daily check-in', 500);
+  const userEmail = req.headers['user-email'] as string;
+  if (!userEmail) {
+    throwError('Missing email. Log in!', 400);
   }
+
+  const user = await getUserByEmail(userEmail);
+  const userId = user?.id;
+
+  const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
+
+  // Get the latest check-in
+  const todayCheckIn = await dailyCheckInRepository.findOne({
+    where: { userId },
+    order: { createdAt: 'DESC' },
+  });
+
+  // Send the UTC timestamp directly
+  sendSuccess(res, todayCheckIn, 200);
 };
