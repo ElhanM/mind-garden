@@ -25,28 +25,13 @@ export const createDailyCheckIn = async (req: Request, res: Response) => {
     throwError('Stress level must be between 1 and 5', 400);
   }
 
-  //addition: user id is now retrieved here on backend to remove the useEffect on front-end that we really didnt need
+  // Get user ID
   const user = await getUserByEmail(userEmail);
   const userId = user?.id;
 
   const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
 
-  // Check if user already has a check-in for today
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const existingCheckIn = await dailyCheckInRepository.findOne({
-    where: {
-      userId,
-      checkInDate: today,
-    },
-  });
-
-  if (existingCheckIn) {
-    throwError('User already has a check-in for today', 400);
-  }
-
-  // Create new check-in
+  // Create and store new check-in with auto UTC timestamp
   const newDailyCheckIn = dailyCheckInRepository.create({
     userId,
     mood,
@@ -55,12 +40,12 @@ export const createDailyCheckIn = async (req: Request, res: Response) => {
   });
 
   const result = await dailyCheckInRepository.save(newDailyCheckIn);
+
   sendSuccess(res, result, 201);
 };
 
 export const getDailyCheckIn = async (req: Request, res: Response) => {
   const userEmail = req.headers['user-email'] as string;
-
   if (!userEmail) {
     throwError('Missing email. Log in!', 400);
   }
@@ -70,15 +55,10 @@ export const getDailyCheckIn = async (req: Request, res: Response) => {
 
   const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // set to midnight (this will make the comparison between checkInDate and current date possible)
-
+  // Get the latest check-in
   const todayCheckIn = await dailyCheckInRepository.findOne({
-    // see if they checked in today
-    where: {
-      userId,
-      checkInDate: today,
-    },
+    where: { userId },
+    order: { createdAt: 'DESC' },
   });
 
   sendSuccess(res, todayCheckIn, 200);

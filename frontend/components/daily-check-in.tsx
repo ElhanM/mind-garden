@@ -40,6 +40,7 @@ import { fetchTodayCheckIn, submitCheckIn } from '../app/api-client/check-in';
 import type { CheckInFormData } from '../validation/check-in-schema';
 import { checkInSchema } from '../validation/check-in-schema';
 import errorCatch from '@/app/api-client/error-message';
+import compareDatesWithoutTimestamp from '@/validation/compare-dates-without-timestamp';
 
 export function DailyCheckIn() {
   const [open, setOpen] = useState(false);
@@ -48,6 +49,7 @@ export function DailyCheckIn() {
   const queryClient = useQueryClient();
   const [submitting, setSubmitting] = useState(false);
   const email = session?.user.email ?? '';
+  let hasCheckedInToday = false;
 
   // Query to check if user already checked in today
   const {
@@ -72,7 +74,9 @@ export function DailyCheckIn() {
     });
   }
 
-  const hasCheckedInToday = !!todayCheckIn;
+  todayCheckIn
+    ? (hasCheckedInToday = compareDatesWithoutTimestamp(todayCheckIn?.createdAt))
+    : (hasCheckedInToday = false);
 
   // Form setup with validation
   const {
