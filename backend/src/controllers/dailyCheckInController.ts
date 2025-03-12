@@ -40,7 +40,6 @@ export const createDailyCheckIn = async (req: Request, res: Response) => {
   });
 
   const result = await dailyCheckInRepository.save(newDailyCheckIn);
-  console.log('New Daily Check-In:', result.checkInDate, ', ', result.createdAt);
 
   sendSuccess(res, result, 201);
 };
@@ -62,6 +61,5 @@ export const getDailyCheckIn = async (req: Request, res: Response) => {
     order: { createdAt: 'DESC' },
   });
 
-  // Send the UTC timestamp directly
   sendSuccess(res, todayCheckIn, 200);
 };

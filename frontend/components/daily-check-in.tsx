@@ -49,6 +49,7 @@ export function DailyCheckIn() {
   const queryClient = useQueryClient();
   const [submitting, setSubmitting] = useState(false);
   const email = session?.user.email ?? '';
+  let hasCheckedInToday = false;
 
   // Query to check if user already checked in today
   const {
@@ -73,7 +74,9 @@ export function DailyCheckIn() {
     });
   }
 
-  const hasCheckedInToday = compareDatesWithoutTimestamp(todayCheckIn);
+  todayCheckIn
+    ? (hasCheckedInToday = compareDatesWithoutTimestamp(todayCheckIn?.createdAt))
+    : (hasCheckedInToday = false);
 
   // Form setup with validation
   const {
