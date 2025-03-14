@@ -6,26 +6,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-if (!process.env.DATABASE_HOST) {
-  throw new Error('DATABASE_HOST is not defined');
-}
-if (!process.env.DATABASE_PORT) {
-  throw new Error('DATABASE_PORT is not defined');
-}
-if (!process.env.DATABASE_USER) {
-  throw new Error('DATABASE_USER is not defined');
-}
-if (!process.env.DATABASE_PASSWORD) {
-  throw new Error('DATABASE_PASSWORD is not defined');
-}
-if (!process.env.DATABASE_NAME) {
-  throw new Error('DATABASE_NAME is not defined');
-}
-
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: process.env.DATABASE_HOST,
-  port: parseInt(process.env.DATABASE_PORT),
+  port: parseInt(process.env.DATABASE_PORT as string),
   username: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
