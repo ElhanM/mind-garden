@@ -1,5 +1,7 @@
-import { Award, Trophy, Star, Zap, Heart } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { achievements } from '@/lib/mock-data';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export function AchievementsList() {
   return (
@@ -42,7 +44,3 @@ export function AchievementsList() {
     </Card>
   );
 }
-
-import { Button } from '@/components/ui/button';
-import { achievements } from '@/app/achievements/page';
-import Link from 'next/link';

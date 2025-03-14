@@ -12,13 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22.13.1"
           cache: "npm"
-      
+
       - name: Install Dependencies
         run: npm install
 
@@ -28,28 +28,103 @@ jobs:
             echo "::error::package-lock.json was modified during install. Please commit the updated lock file."
             exit 1
           fi
-  
+
   prettier-check:
     name: Check Formatting
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22.13.1"
           cache: "npm"
-      
+
       - name: Install Dependencies
         run: npm install
-      
+
       - name: Check Frontend Formatting
         run: |
           cd frontend
           npm run format:check
-      
+
       - name: Check Backend Formatting
         run: |
           cd backend
           npm run format:check
+
+  lint:
+    name: Lint Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.13.1"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Lint Frontend
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Lint Backend
+        run: |
+          cd backend
+          npm run lint
+
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.13.1"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Type Check Frontend
+        run: |
+          cd frontend
+          npm run type-check
+
+      - name: Type Check Backend
+        run: |
+          cd backend
+          npm run type-check
+
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.13.1"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Build Backend
+        run: |
+          cd backend
+          npm run build

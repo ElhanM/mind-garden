@@ -29,8 +29,8 @@ export default function Root() {
           {/* Text without container as requested */}
           <p className="text-base md:text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto">
             MindGarden is a friendly companion app designed to make your day better and help you
-            find connections in ways you never expected. Whether you're facing life challenges, job
-            problems, or simply can't find a way forward, MindGarden is here to guide you.
+            find connections in ways you never expected. Whether you&apos;re facing life challenges,
+            job problems, or simply can&apos;t find a way forward, MindGarden is here to guide you.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export default function Root() {
                 <div>
                   <h3 className="text-lg font-bold mb-2">Emotional Balance</h3>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    Develop resilience and navigate life's challenges with confidence and inner
+                    Develop resilience and navigate life&apos;s challenges with confidence and inner
                     strength.
                   </p>
                 </div>

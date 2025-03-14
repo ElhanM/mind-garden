@@ -1,5 +1,4 @@
-// backend/src/middleware/errorMiddleware.ts
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 
 export class AppError extends Error {
   statusCode: number;
@@ -11,14 +10,7 @@ export class AppError extends Error {
   }
 }
 
-export const errorHandler = (
-  err: Error | AppError,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  console.error('Error:', err);
-
+export const errorHandler = (err: Error | AppError, req: Request, res: Response) => {
   const statusCode = err instanceof AppError ? err.statusCode : 500;
   const message = err.message || 'Internal server error';
 

@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { AppError } from '../middleware/errorMiddleware';
 
-export const sendSuccess = (res: Response, results: any, statusCode = 200) => {
+export const sendSuccess = (res: Response, results: unknown, statusCode = 200) => {
   return res.status(statusCode).json({
     success: true,
     results,
