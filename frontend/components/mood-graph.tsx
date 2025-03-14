@@ -8,9 +8,16 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  TooltipProps,
 } from 'recharts';
 
-const data = [
+// Define the data type
+interface MoodData {
+  date: string;
+  mood: number;
+}
+
+const data: MoodData[] = [
   { date: '10/1', mood: 3 },
   { date: '10/2', mood: 4 },
   { date: '10/3', mood: 3 },
@@ -20,8 +27,9 @@ const data = [
   { date: '10/7', mood: 4 },
 ];
 
-const CustomTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
+// Use proper Recharts tooltip prop types
+const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+  if (active && payload && payload.length > 0) {
     return (
       <div className="rounded-lg border bg-white p-2 shadow-sm">
         <p className="text-sm font-semibold text-gray-700">{`Date: ${label}`}</p>
