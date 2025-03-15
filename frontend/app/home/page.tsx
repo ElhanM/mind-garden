@@ -7,10 +7,31 @@ import { PageLayout } from '@/components/page-layout';
 export default function Home() {
   return (
     <PageLayout>
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-10 md:grid-cols-2">
         <section className="flex flex-col items-center justify-center">
           <div className="h-[300px] w-full max-w-md md:h-[400px]">
             <BonsaiTree />
+          </div>
+          <div className="mt-10 w-full max-w-md rounded-lg border border-gray-200 bg-amber-50 p-4 text-sm shadow-sm">
+            <div className="mb-2 font-medium text-amber-800">Tree Levels</div>
+            <div className="grid grid-cols-1 gap-1">
+              <div className="flex justify-between">
+                <span className="text-amber-700">Level 1:</span>
+                <span className="text-amber-600">0-99 WP</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-amber-700">Level 2:</span>
+                <span className="text-amber-600">100-199 WP</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-amber-700">Level 3:</span>
+                <span className="text-amber-600">200-299 WP</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-amber-700">Level 4:</span>
+                <span className="text-amber-600">300-400 WP</span>
+              </div>
+            </div>
           </div>
         </section>
         <section className="space-y-6">
