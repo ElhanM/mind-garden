@@ -1,5 +1,8 @@
 'use client';
 
+import { fetchCheckInsHistory } from '@/app/api-client/check-in';
+import { useQuery } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
 import {
   LineChart,
   Line,
@@ -17,16 +20,6 @@ interface MoodData {
   mood: number;
 }
 
-const data: MoodData[] = [
-  { date: '10/1', mood: 3 },
-  { date: '10/2', mood: 4 },
-  { date: '10/3', mood: 3 },
-  { date: '10/4', mood: 5 },
-  { date: '10/5', mood: 4 },
-  { date: '10/6', mood: 3 },
-  { date: '10/7', mood: 4 },
-];
-
 // Use proper Recharts tooltip prop types
 const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
   if (active && payload && payload.length > 0) {
@@ -41,6 +34,34 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
 };
 
 export function MoodGraph() {
+  const { data: session } = useSession();
+  const email = session?.user?.email;
+
+  const { data: checkIns, isLoading } = useQuery({
+    queryKey: ['checkIns'],
+    queryFn: () => (email ? fetchCheckInsHistory(email) : Promise.resolve([])),
+    enabled: !!email,
+  });
+
+  const moodMapping: { [key: string]: number } = {
+    great: 5,
+    good: 4,
+    okay: 3,
+    down: 2,
+    bad: 1,
+  };
+
+  const data: MoodData[] =
+    checkIns
+      ?.map((checkIn: CheckIn) => ({
+        date: new Date(checkIn.createdAt).toLocaleDateString('en-US', {
+          month: 'numeric',
+          day: 'numeric',
+        }),
+        mood: moodMapping[checkIn.mood],
+      }))
+      .reverse() || [];
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={data}>

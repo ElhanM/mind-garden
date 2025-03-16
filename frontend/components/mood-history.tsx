@@ -1,5 +1,8 @@
+import { fetchCheckInsHistory } from '@/app/api-client/check-in';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useQuery } from '@tanstack/react-query';
 import { Sun, Cloud, CloudSun, CloudRain, CloudLightning } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 export function MoodHistory() {
   // In a real app, these would be fetched from an API

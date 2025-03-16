@@ -31,3 +31,16 @@ export const submitCheckIn = async (data: CheckInFormData, email: string) => {
 
   return response.data.results;
 };
+
+export async function fetchCheckInsHistory(email: string) {
+  const response = await api.get(`/api/check-ins/history`, {
+    method: 'GET',
+    headers: { 'user-email': email }, // Correcting the header
+  });
+
+  if (response.data.success !== true) {
+    throw new Error(response.data.message);
+  }
+
+  return response.data.results;
+}
