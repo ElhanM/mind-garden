@@ -26,7 +26,11 @@ export function StreaksCalendar() {
 
   // Measure container width on mount and resize
   useEffect(() => {
+    // Ensure the container element exists before measuring
+
     if (!containerRef.current) return;
+
+    // Function to update the container width
 
     const updateWidth = () => {
       if (containerRef.current) {
@@ -34,19 +38,22 @@ export function StreaksCalendar() {
       }
     };
 
-    // Initial measurement
+    // Measure the initial width on mount
     updateWidth();
 
     // Update on resize
+    // Create a ResizeObserver to track container size changes
+
     const resizeObserver = new ResizeObserver(updateWidth);
     resizeObserver.observe(containerRef.current);
 
+    // Cleanup function: Stop observing on unmount
     return () => {
       if (containerRef.current) {
         resizeObserver.unobserve(containerRef.current);
       }
     };
-  }, []);
+  }, []); // Runs only once when component mounts
 
   const { data: checkIns, isLoading } = useQuery({
     queryKey: ['checkIns', email],
@@ -126,7 +133,7 @@ export function StreaksCalendar() {
           day_range_end: 'day-range-end',
           day_selected:
             'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
-          day_today: 'bg-accent text-accent-foreground',
+          day_today: 'bg-accent text-accent-foreground flex items-center justify-center w-9 h-9',
           day_outside: 'day-outside text-muted-foreground opacity-50',
           day_disabled: 'text-muted-foreground opacity-50',
           day_range_middle: 'aria-selected:bg-accent aria-selected:text-accent-foreground',

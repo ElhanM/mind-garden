@@ -10,8 +10,6 @@ export default function Root() {
   const session = useSession();
   const isLoading = session.status === 'loading';
 
-  console.log(session);
-
   const handleAction = () => {
     if (session.status === 'authenticated') {
       router.push('/home');

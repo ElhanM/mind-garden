@@ -82,7 +82,7 @@ export const getCheckInsHistory = async (req: Request, res: Response) => {
   // Get all check-ins for the user, ordered from newest to oldest
   const checkIns = await dailyCheckInRepository.find({
     where: { userId },
-    order: { createdAt: 'DESC' },
+    order: { createdAt: 'ASC' },
   });
 
   sendSuccess(res, checkIns, 200);
