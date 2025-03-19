@@ -6,7 +6,7 @@ export const fetchTodayCheckIn = async (email: string | null) => {
   if (!email) return null;
 
   const response = await api.get(`/api/check-ins`, {
-    headers: { 'user-email': email }, // Correcting the header
+    headers: { 'user-email': email },
   });
 
   if (response.data.success !== true) {
@@ -21,9 +21,24 @@ export const submitCheckIn = async (data: CheckInFormData, email: string) => {
     `/api/check-ins`,
     { ...data },
     {
-      headers: { 'user-email': email }, // Email is now in headers
+      headers: { 'user-email': email },
     }
   );
+
+  if (response.data.success !== true) {
+    throw new Error(response.data.message);
+  }
+
+  return response.data.results;
+};
+
+// Function to fetch WP status
+export const fetchWPStatus = async (email: string | null) => {
+  if (!email) return { wp: 0 };
+
+  const response = await api.get(`/api/wp-status`, {
+    headers: { 'user-email': email },
+  });
 
   if (response.data.success !== true) {
     throw new Error(response.data.message);

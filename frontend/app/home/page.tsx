@@ -1,31 +1,85 @@
+'use client';
+import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import Image from 'next/image'; // Import Next.js Image component
 import { CardWithTitle } from '@/components/ui/card-with-title';
-import { BonsaiTree } from '@/components/bonsai-tree';
 import { AchievementsList } from '@/components/achievements-list';
 import { MoodHistory } from '@/components/mood-history';
 import { PageLayout } from '@/components/page-layout';
+import { WPBar } from '@/components/ui/wp-bar';
+import { fetchWPStatus } from '@/app/api-client/check-in';
 
 export default function Home() {
+  const { data: session } = useSession();
+  const email = session?.user.email ?? '';
+  const [wp, setWP] = useState(0);
+
+  // Fetch WP status when the component mounts or when the email changes
+  useEffect(() => {
+    async function getWP() {
+      if (email) {
+        try {
+          const response = await fetchWPStatus(email);
+          setWP(response.wp); // Update the WP state
+        } catch (error) {
+          console.error('Failed to fetch WP status:', error);
+        }
+      }
+    }
+    getWP();
+  }, [email]);
+
+  // Function to refresh WP dynamically
+  const refreshWP = async () => {
+    if (email) {
+      try {
+        const response = await fetchWPStatus(email);
+        setWP(response.wp); // Update the WP state
+      } catch (error) {
+        console.error('Failed to refresh WP status:', error);
+      }
+    }
+  };
+
+  // Determine the bonsai tree level based on WP
+  const getBonsaiTreeImage = () => {
+    if (wp >= 0 && wp <= 90) return '/BonsaiLevel1.gif';
+    if (wp >= 100 && wp <= 190) return '/BonsaiLevel2.gif';
+    if (wp >= 200 && wp <= 290) return '/BonsaiLevel3.gif';
+    if (wp >= 300 && wp <= 400) return '/BonsaiLevel4.gif';
+    return '/BonsaiLevel4.gif'; // Default to level 4 if WP is out of range, go beyond 400
+  };
+
   return (
     <PageLayout>
       <div className="grid gap-10 md:grid-cols-2">
         <section className="flex flex-col items-center justify-center">
+          {/* Dynamically render the bonsai tree image */}
           <div className="h-[300px] w-full max-w-md md:h-[400px]">
-            <BonsaiTree />
+            <Image
+              src={getBonsaiTreeImage()}
+              alt="Bonsai Tree"
+              width={400}
+              height={400}
+              className="object-contain"
+            />
           </div>
+          {/* Pass the dynamically updated WP and refresh function to WPBar */}
+          <WPBar wp={wp} refreshWP={refreshWP} />
           <div className="mt-10 w-full max-w-md rounded-lg border border-gray-200 bg-amber-50 p-4 text-sm shadow-sm">
             <div className="mb-2 font-medium text-amber-800">Tree Levels</div>
             <div className="grid grid-cols-1 gap-1">
               <div className="flex justify-between">
                 <span className="text-amber-700">Level 1:</span>
-                <span className="text-amber-600">0-99 WP</span>
+                <span className="text-amber-600">0-90 WP</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-amber-700">Level 2:</span>
-                <span className="text-amber-600">100-199 WP</span>
+                <span className="text-amber-600">100-190 WP</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-amber-700">Level 3:</span>
-                <span className="text-amber-600">200-299 WP</span>
+                <span className="text-amber-600">200-290 WP</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-amber-700">Level 4:</span>
@@ -71,3 +125,6 @@ export default function Home() {
     </PageLayout>
   );
 }
+
+// OVAJ REFRESH ZEZA, NIKAKO DA FETCH-A DATA KAKO TREBA
+// TREBA SE SKLONITI BUTTON OVAJ I DINAMICKI SKONTAT KAKO DA SE REFRESH-A

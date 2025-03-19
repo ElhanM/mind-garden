@@ -1,4 +1,3 @@
-// backend/src/index.ts
 import 'express-async-errors'; // This must be the first import!
 import express from 'express';
 import cors from 'cors';
@@ -6,6 +5,8 @@ import { errorHandler } from './middleware/errorMiddleware';
 import { AppDataSource } from './data-source';
 // Import your routes
 import dailyCheckInRoutes from './routes/dailyCheckInRoutes';
+import wpRoutes from './routes/wpRoutes'; // Add this line
+
 // Initialize database connection
 AppDataSource.initialize()
   .then(() => {
@@ -24,7 +25,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/check-ins', dailyCheckInRoutes);
-// Add other routes here
+app.use('/api', wpRoutes); // Add this line
 
 // Error handler - MUST be after all routes and middleware
 app.use(errorHandler);
