@@ -27,11 +27,9 @@ export function StreaksCalendar() {
   // Measure container width on mount and resize
   useEffect(() => {
     // Ensure the container element exists before measuring
-
     if (!containerRef.current) return;
 
     // Function to update the container width
-
     const updateWidth = () => {
       if (containerRef.current) {
         setContainerWidth(containerRef.current.offsetWidth);
@@ -43,7 +41,6 @@ export function StreaksCalendar() {
 
     // Update on resize
     // Create a ResizeObserver to track container size changes
-
     const resizeObserver = new ResizeObserver(updateWidth);
     resizeObserver.observe(containerRef.current);
 
@@ -82,64 +79,90 @@ export function StreaksCalendar() {
   }
 
   return (
-    <div ref={containerRef} className="flex justify-center items-center w-full">
-      <Calendar
-        mode="single"
-        month={displayMonth}
-        onMonthChange={handleMonthChange}
-        components={{
-          DayContent: ({ date }) => {
-            const isStreakDay = streakDays.some((streakDate) => isSameDay(date, streakDate));
-            return (
-              <div className="relative flex h-9 w-9 items-center justify-center">
-                <div
-                  className={
-                    isStreakDay
-                      ? 'flex h-7 w-7 items-center justify-center rounded-full bg-orange-100'
-                      : ''
-                  }
-                >
-                  {date.getDate()}
+    <div ref={containerRef} className="flex flex-col items-center w-full">
+      <div className="w-full flex justify-center">
+        <Calendar
+          mode="single"
+          month={displayMonth}
+          onMonthChange={handleMonthChange}
+          components={{
+            DayContent: ({ date }) => {
+              const isStreakDay = streakDays.some((streakDate) => isSameDay(date, streakDate));
+              const isToday = isSameDay(date, today);
+
+              return (
+                <div className="relative flex h-9 w-9 items-center justify-center">
+                  <div
+                    className={`flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200 ${
+                      isToday
+                        ? 'bg-purple-500 text-white font-medium ring-2 ring-purple-200'
+                        : isStreakDay
+                          ? 'bg-orange-100'
+                          : ''
+                    }`}
+                  >
+                    {date.getDate()}
+                  </div>
+                  {isStreakDay && !isToday && (
+                    <Flame className="absolute -top-1 -right-1 h-4 w-4 z-50 text-orange-500" />
+                  )}
+                  {isStreakDay && isToday && (
+                    <div className="absolute -top-1 -right-1 z-50 flex h-4 w-4 items-center justify-center rounded-full bg-white">
+                      <Flame className="h-3.5 w-3.5 text-orange-500" />
+                    </div>
+                  )}
                 </div>
-                {isStreakDay && (
-                  <Flame className="absolute -top-1 -right-1 h-4 w-4 z-50 text-orange-500" />
-                )}
-              </div>
-            );
-          },
-        }}
-        disabled={[
-          { after: today }, // Disable future dates
-        ]}
-        fromMonth={new Date(2023, 0, 1)} // Limit how far back users can navigate
-        toMonth={addMonths(today, 3)} // Allow navigation to 3 months in the future
-        numberOfMonths={monthsToShow} // Dynamic based on container width
-        className="mx-auto" // Center the calendar
-        classNames={{
-          months:
-            monthsToShow === 1
-              ? 'flex justify-center'
-              : 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 justify-center',
-          month: 'space-y-4',
-          caption: 'flex justify-center pt-1 relative items-center',
-          caption_label: 'text-sm font-medium',
-          nav: 'space-x-1 flex items-center',
-          table: 'w-full border-collapse space-y-1',
-          head_row: 'flex',
-          head_cell: 'text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]',
-          row: 'flex w-full mt-2',
-          cell: 'h-8 w-8 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
-          day: 'h-8 w-8 p-0 font-normal aria-selected:opacity-100',
-          day_range_end: 'day-range-end',
-          day_selected:
-            'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
-          day_today: 'bg-accent text-accent-foreground flex items-center justify-center w-9 h-9',
-          day_outside: 'day-outside text-muted-foreground opacity-50',
-          day_disabled: 'text-muted-foreground opacity-50',
-          day_range_middle: 'aria-selected:bg-accent aria-selected:text-accent-foreground',
-          day_hidden: 'invisible',
-        }}
-      />
+              );
+            },
+          }}
+          disabled={[
+            { after: today }, // Disable future dates
+          ]}
+          fromMonth={new Date(2023, 0, 1)} // Limit how far back users can navigate
+          toMonth={addMonths(today, 3)} // Allow navigation to 3 months in the future
+          numberOfMonths={monthsToShow} // Dynamic based on container width
+          className="mx-auto" // Center the calendar
+          classNames={{
+            months:
+              monthsToShow === 1
+                ? 'flex justify-center'
+                : 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 justify-center',
+            month: 'space-y-4',
+            caption: 'flex justify-center pt-1 relative items-center',
+            caption_label: 'text-sm font-medium',
+            nav: 'space-x-1 flex items-center',
+            table: 'w-full border-collapse space-y-1',
+            head_row: 'flex',
+            head_cell: 'text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]',
+            row: 'flex w-full mt-2',
+            cell: 'h-8 w-8 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+            day: 'h-8 w-8 p-0 font-normal aria-selected:opacity-100',
+            day_range_end: 'day-range-end',
+            day_selected:
+              'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
+            day_today: '', // We're handling today styling in the DayContent component
+            day_outside: 'day-outside text-muted-foreground opacity-50',
+            day_disabled: 'text-muted-foreground opacity-50',
+            day_range_middle: 'aria-selected:bg-accent aria-selected:text-accent-foreground',
+            day_hidden: 'invisible',
+          }}
+          // Remove the footer prop from here
+        />
+      </div>
+
+      {/* Single legend that appears below the calendar(s) */}
+      <div className="mt-4 flex items-center justify-center gap-6 text-xs text-muted-foreground">
+        <div className="flex items-center">
+          <div className="mr-2 h-3 w-3 rounded-full bg-orange-100 flex items-center justify-center">
+            <Flame className="h-2 w-2 text-orange-500" />
+          </div>
+          <span>Streak day</span>
+        </div>
+        <div className="flex items-center">
+          <div className="mr-2 h-3 w-3 rounded-full bg-purple-500"></div>
+          <span>Today</span>
+        </div>
+      </div>
     </div>
   );
 }
