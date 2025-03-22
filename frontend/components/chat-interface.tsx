@@ -1,14 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send } from 'lucide-react';
 import { PageContainer } from './page-container';
+import { generateAIResponse } from '@/app/api-client/ai-chat';
+import type { ChatMessage } from '@/types/Chat';
+import { useSession } from 'next-auth/react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export function ChatInterface() {
-  const [messages, setMessages] = useState([
+  const { data: session } = useSession();
+  const email = session?.user.email ?? '';
+  const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'system',
       content:
@@ -17,58 +24,79 @@ export function ChatInterface() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollArea = scrollAreaRef.current;
+      scrollArea.scrollTop = scrollArea.scrollHeight;
+    }
+    if (messages.length > 0) {
+      console.log('Latest message content:', messages[messages.length - 1].content);
+    }
+  }, [messages]);
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
+    if (!email) {
+      console.error('User is not authenticated. Please log in.');
+      return;
+    }
 
-    // Add user message
-    const userMessage = { role: 'user', content: input };
-    setMessages([...messages, userMessage]);
+    const userMessage: ChatMessage = { role: 'user', content: input };
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
-    // In a real app, this would call an AI API
-    setTimeout(() => {
-      // Simulate AI response
-      let response;
-      if (input.toLowerCase().includes('anxious') || input.toLowerCase().includes('anxiety')) {
-        response = {
-          role: 'assistant',
-          content:
-            'I understand feeling anxious can be challenging. Have you tried any breathing exercises? Taking 5 deep breaths can help calm your nervous system. Would you like me to guide you through a quick breathing exercise?',
-        };
-      } else if (input.toLowerCase().includes('sad') || input.toLowerCase().includes('down')) {
-        response = {
-          role: 'assistant',
-          content:
-            "I'm sorry to hear you're feeling down. Remember that it's okay to have these feelings. Would it help to talk about what's causing this feeling, or would you prefer some suggestions for mood-lifting activities?",
-        };
-      } else if (
-        input.toLowerCase().includes('stress') ||
-        input.toLowerCase().includes('stressed')
-      ) {
-        response = {
-          role: 'assistant',
-          content:
-            "Stress can be overwhelming. One technique that might help is to identify what's in your control and what isn't. For the things you can control, consider making a simple action plan. Would you like to explore some stress management techniques?",
-        };
-      } else {
-        response = {
-          role: 'assistant',
-          content:
-            "Thank you for sharing. Remember that taking care of your mental health is a journey, and you're making progress by checking in with yourself. Is there anything specific you'd like guidance on today?",
-        };
-      }
+    const assistantMessageIndex = messages.length;
+    setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
 
-      setMessages((prev) => [...prev, response]);
+    try {
+      setIsStreaming(false);
+
+      await generateAIResponse(email, input, (token) => {
+        // As soon as we get the first token, we're streaming
+        if (!isStreaming) {
+          setIsStreaming(true);
+          setIsLoading(false); // Hide the loading indicator
+        }
+        // update assistant
+        setMessages((prev) => {
+          const updated = [...prev];
+          const lastIndex = updated.length - 1;
+          updated[lastIndex] = {
+            ...updated[lastIndex],
+            content: updated[lastIndex].content + token,
+          };
+          return updated;
+        });
+      });
+      // znam da su try catchovi kurati al promjenice se
+    } catch (error) {
+      console.error('Streaming failed:', error);
+      setMessages((prev) => {
+        const updated = [...prev];
+        const lastIndex = updated.length - 1;
+        if (updated[lastIndex].role === 'assistant' && updated[lastIndex].content === '') {
+          updated[lastIndex] = {
+            ...updated[lastIndex],
+            content: 'Sorry, there was an error processing your request.',
+          };
+        }
+        return updated;
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+      setIsStreaming(false);
+    }
   };
-
   return (
     <PageContainer className="h-[calc(100vh-8rem)] py-4">
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>## Hello, *world*!</ReactMarkdown>
       <div className="flex h-full flex-col rounded-lg border border-gray-300 bg-white shadow-md">
-        <ScrollArea className="flex-1 p-4">
+        <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
           <div className="space-y-4">
             {messages.map((message, index) => (
               <div
@@ -82,27 +110,10 @@ export function ChatInterface() {
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
-                  {message.content}
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
                 </div>
               </div>
             ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="max-w-[80%] rounded-lg bg-gray-100 px-4 py-2 text-gray-800">
-                  <div className="flex space-x-1">
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400"></div>
-                    <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
-                      style={{ animationDelay: '0.2s' }}
-                    ></div>
-                    <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
-                      style={{ animationDelay: '0.4s' }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </ScrollArea>
         <div className="border-t border-gray-300 p-4">
@@ -119,7 +130,7 @@ export function ChatInterface() {
               onChange={(e) => setInput(e.target.value)}
               className="flex-1"
             />
-            <Button type="submit" disabled={isLoading || !input.trim()}>
+            <Button type="submit" disabled={isLoading || !input.trim() || !email}>
               <Send className="h-4 w-4" />
               <span className="sr-only">Send</span>
             </Button>

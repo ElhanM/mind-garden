@@ -58,3 +58,13 @@ CREATE TABLE daily_check_ins (
     check_in_date DATE NOT NULL DEFAULT CURRENT_DATE,
     UNIQUE(user_id, check_in_date)
 );
+
+-- Chat
+CREATE TABLE chat (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    role VARCHAR(9) NOT NULL CHECK (role IN ('user', 'system', 'assistant')),
+    content TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
