@@ -93,50 +93,87 @@ export function ChatInterface() {
     }
   };
   return (
-    <PageContainer className="h-[calc(100vh-8rem)] py-4">
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>## Hello, *world*!</ReactMarkdown>
-      <div className="flex h-full flex-col rounded-lg border border-gray-300 bg-white shadow-md">
-        <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-          <div className="space-y-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                    message.role === 'user'
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  <ReactMarkdown>{message.content}</ReactMarkdown>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-        <div className="border-t border-gray-300 p-4">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSendMessage();
-            }}
-            className="flex gap-2"
-          >
-            <Input
-              placeholder="Type your message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="submit" disabled={isLoading || !input.trim() || !email}>
-              <Send className="h-4 w-4" />
-              <span className="sr-only">Send</span>
-            </Button>
-          </form>
-        </div>
+    <>
+      <div className="prose">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {`# My Awesome Document
+
+## Introduction
+
+This is an introduction to my awesome document. Here are some things we will cover:
+
+- Topic 1
+- Topic 2
+- Topic 3
+
+## Details
+
+### Topic 1
+
+Here are some details about Topic 1.
+
+1. First point
+2. Second point
+3. Third point
+
+### Topic 2
+
+**This is important** information about Topic 2.
+
+- [ ] Task 1
+- [x] Task 2 (completed)
+
+## Conclusion
+
+Thank you for reading!`}
+        </ReactMarkdown>
       </div>
-    </PageContainer>
+      <PageContainer className="h-[calc(100vh-8rem)] py-4">
+        <>
+          <div className="flex h-full flex-col rounded-lg border border-gray-300 bg-white shadow-md">
+            <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+              <div className="space-y-4">
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`prose max-w-[80%] rounded-lg px-4 py-2 ${
+                        message.role === 'user'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+            <div className="border-t border-gray-300 p-4">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendMessage();
+                }}
+                className="flex gap-2"
+              >
+                <Input
+                  placeholder="Type your message..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="flex-1"
+                />
+                <Button type="submit" disabled={isLoading || !input.trim() || !email}>
+                  <Send className="h-4 w-4" />
+                  <span className="sr-only">Send</span>
+                </Button>
+              </form>
+            </div>
+          </div>
+        </>
+      </PageContainer>
+    </>
   );
 }
