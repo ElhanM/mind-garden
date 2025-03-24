@@ -5,9 +5,7 @@ import type { CheckInFormData } from '../../../validation/check-in-schema';
 export const fetchTodayCheckIn = async (email: string | null) => {
   if (!email) return null;
 
-  const response = await api.get(`/api/check-ins`, {
-    headers: { 'user-email': email }, // Correcting the header
-  });
+  const response = await api.get(`/api/check-ins`);
 
   if (response.data.success !== true) {
     throw new Error(response.data.message);
@@ -17,13 +15,7 @@ export const fetchTodayCheckIn = async (email: string | null) => {
 };
 
 export const submitCheckIn = async (data: CheckInFormData, email: string) => {
-  const response = await api.post(
-    `/api/check-ins`,
-    { ...data },
-    {
-      headers: { 'user-email': email }, // Email is now in headers
-    }
-  );
+  const response = await api.post(`/api/check-ins`, { ...data });
 
   if (response.data.success !== true) {
     throw new Error(response.data.message);
@@ -35,7 +27,6 @@ export const submitCheckIn = async (data: CheckInFormData, email: string) => {
 export async function fetchCheckInsHistory(email: string) {
   const response = await api.get(`/api/check-ins/history`, {
     method: 'GET',
-    headers: { 'user-email': email }, // Correcting the header
   });
 
   if (response.data.success !== true) {

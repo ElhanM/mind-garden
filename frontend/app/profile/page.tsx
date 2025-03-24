@@ -28,7 +28,7 @@ export default function ProfilePage() {
                 <Skeleton className="h-[145px] w-[145px] rounded-full" />
               ) : (
                 <Image
-                  src={profileImage || '/placeholder.svg'}
+                  src={profileImage}
                   alt="Profile Picture"
                   width={145}
                   height={145}
