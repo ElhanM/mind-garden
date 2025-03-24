@@ -149,20 +149,6 @@ export function StreaksCalendar() {
           // Remove the footer prop from here
         />
       </div>
-
-      {/* Single legend that appears below the calendar(s) */}
-      <div className="mt-4 flex items-center justify-center gap-6 text-xs text-muted-foreground">
-        <div className="flex items-center">
-          <div className="mr-2 h-3 w-3 rounded-full bg-orange-100 flex items-center justify-center">
-            <Flame className="h-2 w-2 text-orange-500" />
-          </div>
-          <span>Streak day</span>
-        </div>
-        <div className="flex items-center">
-          <div className="mr-2 h-3 w-3 rounded-full bg-purple-500"></div>
-          <span>Today</span>
-        </div>
-      </div>
     </div>
   );
 }
