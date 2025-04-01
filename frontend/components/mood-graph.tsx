@@ -14,6 +14,7 @@ import {
   ResponsiveContainer,
   type TooltipProps,
 } from 'recharts';
+import { Skeleton } from './ui/skeleton';
 
 // Define the data type
 interface MoodData {
@@ -69,7 +70,53 @@ export function MoodGraph() {
     })) || [];
 
   if (isLoading) {
-    return <div className="flex justify-center py-4">Loading...</div>;
+    return (
+      <div className="w-full h-[300px] flex flex-col">
+        {/* X-axis labels skeleton */}
+        <div className="mt-auto mb-2 flex justify-between px-8">
+          {Array(5)
+            .fill(0)
+            .map((_, i) => (
+              <Skeleton key={`x-${i}`} className="h-4 w-16" />
+            ))}
+        </div>
+
+        {/* Chart area skeleton */}
+        <div className="relative flex-1 w-full">
+          {/* Y-axis labels skeleton */}
+          <div className="absolute left-0 top-0 h-full flex flex-col justify-between py-2">
+            {Array(5)
+              .fill(0)
+              .map((_, i) => (
+                <Skeleton key={`y-${i}`} className="h-4 w-8" />
+              ))}
+          </div>
+
+          {/* Grid lines skeleton */}
+          <div className="absolute left-12 right-0 top-0 h-full flex flex-col justify-between py-2">
+            {Array(5)
+              .fill(0)
+              .map((_, i) => (
+                <Skeleton key={`grid-${i}`} className="h-[1px] w-full opacity-30" />
+              ))}
+          </div>
+
+          {/* Line chart skeleton */}
+          <div className="absolute left-12 right-4 top-1/2 transform -translate-y-1/2">
+            <Skeleton className="h-[3px] w-full" />
+          </div>
+
+          {/* Data points skeleton */}
+          <div className="absolute left-12 right-4 top-0 h-full flex justify-between items-center">
+            {Array(7)
+              .fill(0)
+              .map((_, i) => (
+                <Skeleton key={`point-${i}`} className="h-3 w-3 rounded-full" />
+              ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

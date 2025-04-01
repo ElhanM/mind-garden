@@ -7,6 +7,7 @@ import { Flame } from 'lucide-react';
 import { fetchCheckInsHistory } from '@/app/api-client/check-in';
 import { useSession } from 'next-auth/react';
 import { useQuery } from '@tanstack/react-query';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function StreaksCalendar() {
   const { data: session } = useSession();
@@ -75,7 +76,67 @@ export function StreaksCalendar() {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center py-4">Loading...</div>;
+    return (
+      <div ref={containerRef} className="w-full flex justify-center">
+        <div className={`flex ${hasSpaceForTwoMonths ? 'flex-row space-x-6' : ''}`}>
+          {/* First month skeleton */}
+          <div className="w-[240px]">
+            {/* Month header */}
+            <div className="flex justify-center mb-4 pt-3">
+              <Skeleton className="h-6 w-32" />
+            </div>
+
+            {/* Calendar grid - simplified representation */}
+            <div className="space-y-3">
+              {/* Weekday headers */}
+              <div className="flex justify-between px-1">
+                {[...Array(7)].map((_, i) => (
+                  <Skeleton key={`h-${i}`} className="h-4 w-4" />
+                ))}
+              </div>
+
+              {/* Calendar rows - just showing the shape */}
+              {[...Array(6)].map((_, row) => (
+                <div key={`r-${row}`} className="flex justify-between px-1">
+                  {[...Array(7)].map((_, col) => (
+                    <Skeleton key={`c-${row}-${col}`} className="h-6 w-6 rounded-full" />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Second month skeleton (only shown if there's enough space) */}
+          {hasSpaceForTwoMonths && (
+            <div className="w-[240px]">
+              {/* Month header */}
+              <div className="flex justify-center mb-4 pt-3">
+                <Skeleton className="h-6 w-32" />
+              </div>
+
+              {/* Calendar grid - simplified representation */}
+              <div className="space-y-3">
+                {/* Weekday headers */}
+                <div className="flex justify-between px-1">
+                  {[...Array(7)].map((_, i) => (
+                    <Skeleton key={`h2-${i}`} className="h-4 w-4" />
+                  ))}
+                </div>
+
+                {/* Calendar rows - just showing the shape */}
+                {[...Array(6)].map((_, row) => (
+                  <div key={`r2-${row}`} className="flex justify-between px-1">
+                    {[...Array(7)].map((_, col) => (
+                      <Skeleton key={`c2-${row}-${col}`} className="h-6 w-6 rounded-full" />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -146,7 +207,6 @@ export function StreaksCalendar() {
             day_range_middle: 'aria-selected:bg-accent aria-selected:text-accent-foreground',
             day_hidden: 'invisible',
           }}
-          // Remove the footer prop from here
         />
       </div>
     </div>
