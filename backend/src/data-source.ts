@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { User } from './entities/User';
 import { DailyCheckIn } from './entities/DailyCheckIn';
 import dotenv from 'dotenv';
+import { Chat } from './entities/Chat';
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DATABASE_NAME,
   synchronize: false, // Set to false for production
   logging: process.env.NODE_ENV !== 'production',
-  entities: [User, DailyCheckIn],
+  entities: [User, DailyCheckIn, Chat],
   migrations: [],
   subscribers: [],
   ssl: true,
