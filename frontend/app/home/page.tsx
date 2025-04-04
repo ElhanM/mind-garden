@@ -1,45 +1,35 @@
 'use client';
 import { useSession } from 'next-auth/react';
-import { useState, useEffect } from 'react';
 import Image from 'next/image'; // Import Next.js Image component
 import { CardWithTitle } from '@/components/ui/card-with-title';
 import { AchievementsList } from '@/components/achievements-list';
 import { MoodHistory } from '@/components/mood-history';
 import { PageLayout } from '@/components/page-layout';
 import { WPBar } from '@/components/ui/wp-bar';
-import { fetchWPStatus } from '@/app/api-client/check-in';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 
 export default function Home() {
   const { data: session } = useSession();
-  const email = session?.user.email ?? '';
-  const [wp, setWP] = useState(0);
+  const userId = session?.user.id ?? '';
 
-  // Fetch WP status when the component mounts or when the email changes
-  useEffect(() => {
-    async function getWP() {
-      if (email) {
-        try {
-          const response = await fetchWPStatus(email);
-          setWP(response.wp); // Update the WP state
-        } catch (error) {
-          console.error('Failed to fetch WP status:', error);
-        }
-      }
-    }
-    getWP();
-  }, [email]);
-
-  // Function to refresh WP dynamically
-  const refreshWP = async () => {
-    if (email) {
-      try {
-        const response = await fetchWPStatus(email);
-        setWP(response.wp); // Update the WP state
-      } catch (error) {
-        console.error('Failed to refresh WP status:', error);
-      }
-    }
-  };
+  // Fetch WP status using React Query
+  const {
+    data: wp = 0,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['wp-status', userId], // Query key includes id for user-specific caching
+    queryFn: async () => {
+      if (!userId) throw new Error('User id is required');
+      const response = await axios.get('/api/wp/wp-status', {
+        headers: { 'user-id': userId }, // Assuming user id is available in session
+      });
+      return response.data.wp;
+    },
+    enabled: !!userId, // Only fetch if id is available
+    refetchOnWindowFocus: true, // Automatically refetch when the window regains focus
+  });
 
   // Determine the bonsai tree level based on WP
   const getBonsaiTreeImage = () => {
@@ -64,8 +54,8 @@ export default function Home() {
               className="object-contain"
             />
           </div>
-          {/* Pass the dynamically updated WP and refresh function to WPBar */}
-          <WPBar wp={wp} refreshWP={refreshWP} />
+          {/* Pass the dynamically updated WP to WPBar */}
+          <WPBar wp={wp} />
           <div className="mt-10 w-full max-w-md rounded-lg border border-gray-200 bg-amber-50 p-4 text-sm shadow-sm">
             <div className="mb-2 font-medium text-amber-800">Tree Levels</div>
             <div className="grid grid-cols-1 gap-1">
@@ -125,6 +115,3 @@ export default function Home() {
     </PageLayout>
   );
 }
-
-// OVAJ REFRESH ZEZA, NIKAKO DA FETCH-A DATA KAKO TREBA
-// TREBA SE SKLONITI BUTTON OVAJ I DINAMICKI SKONTAT KAKO DA SE REFRESH-A

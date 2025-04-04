@@ -3,9 +3,10 @@ import express from 'express';
 import cors from 'cors';
 import { errorHandler } from './middleware/errorMiddleware';
 import { AppDataSource } from './data-source';
+
 // Import your routes
 import dailyCheckInRoutes from './routes/dailyCheckInRoutes';
-import wpRoutes from './routes/wpRoutes'; // Add this line
+import wpRoutes from './routes/wpRoutes'; // Add wp router
 
 // Initialize database connection
 AppDataSource.initialize()
@@ -25,7 +26,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/check-ins', dailyCheckInRoutes);
-app.use('/api', wpRoutes); // Add this line
+app.use('/api/wp', wpRoutes); // Add this route
 
 // Error handler - MUST be after all routes and middleware
 app.use(errorHandler);
