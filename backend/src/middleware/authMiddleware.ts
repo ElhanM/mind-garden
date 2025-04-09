@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client } from 'google-auth-library';
+import { throwError } from '../utils/responseHandlers';
 
 const client = new OAuth2Client();
 
@@ -16,7 +17,7 @@ export const authMiddleware = async (
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ message: 'Missing or invalid token' });
+    throwError('Missing or invalid token', 401);
     return; // exit early without calling next()
   }
 
@@ -25,34 +26,28 @@ export const authMiddleware = async (
   // Validate the token format (basic check for segments)
   const tokenSegments = token.split('.');
   if (tokenSegments.length !== 3) {
-    res.status(401).json({ message: 'Invalid token format' });
+    throwError('Invalid token format', 401);
+  }
+  // Verify the token with Google
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_ID,
+  });
+
+  const payload = ticket.getPayload();
+
+  // If no email in the payload, reject the request
+  if (!payload?.email) {
+    throwError('Invalid token, no email found', 401);
+    return; // exit early without calling next()
   }
 
-  try {
-    // Verify the token with Google
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_ID,
-    });
+  // Attach the user email and name to the request object
+  req.user = {
+    email: payload.email,
+    name: payload.name,
+  };
 
-    const payload = ticket.getPayload();
-
-    // If no email in the payload, reject the request
-    if (!payload?.email) {
-      res.status(401).json({ message: 'Invalid token, no email found' });
-      return; // exit early without calling next()
-    }
-
-    // Attach the user email and name to the request object
-    req.user = {
-      email: payload.email,
-      name: payload.name,
-    };
-
-    // Continue to the next middleware or route handler
-    next();
-  } catch (err) {
-    console.error('Auth error:', err);
-    res.status(401).json({ message: 'Authentication failed' });
-  }
+  // Continue to the next middleware or route handler
+  next();
 };
