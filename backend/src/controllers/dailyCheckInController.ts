@@ -63,3 +63,27 @@ export const getDailyCheckIn = async (req: Request, res: Response) => {
 
   sendSuccess(res, todayCheckIn, 200);
 };
+
+export const getCheckInsHistory = async (req: Request, res: Response) => {
+  const userEmail = req.headers['user-email'] as string;
+  if (!userEmail) {
+    throwError('Missing email. Log in!', 400);
+  }
+
+  const user = await getUserByEmail(userEmail);
+  const userId = user?.id;
+
+  if (!userId) {
+    throwError('User not found', 404);
+  }
+
+  const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
+
+  // Get all check-ins for the user, ordered from newest to oldest
+  const checkIns = await dailyCheckInRepository.find({
+    where: { userId },
+    order: { createdAt: 'ASC' },
+  });
+
+  sendSuccess(res, checkIns, 200);
+};
