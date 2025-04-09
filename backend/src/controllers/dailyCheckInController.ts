@@ -8,7 +8,9 @@ import { getUserByEmail } from '../utils/idHandler';
 
 export const createDailyCheckIn = async (req: Request, res: Response) => {
   const { mood, stressLevel, journalEntry } = req.body;
-  const userEmail = req.user?.email as string;
+  const userEmail = req.headers['user-email'] as string;
+
+  // const userEmail = req.user?.email as string;
 
   if (!userEmail || !mood || !stressLevel) {
     throwError('Missing required fields', 400);
@@ -45,10 +47,10 @@ export const createDailyCheckIn = async (req: Request, res: Response) => {
 };
 
 export const getDailyCheckIn = async (req: Request, res: Response) => {
-  const userEmail = req.user?.email as string;
-  if (!userEmail) {
-    throwError('Missing email. Log in!', 400);
-  }
+  const userEmail = req.headers['user-email'] as string;
+
+  // const userEmail = req.user?.email as string;
+
   if (!userEmail) {
     throwError('Missing email. Log in!', 400);
   }
@@ -68,7 +70,10 @@ export const getDailyCheckIn = async (req: Request, res: Response) => {
 };
 
 export const getCheckInsHistory = async (req: Request, res: Response) => {
-  const userEmail = req.user?.email as string;
+  const userEmail = req.headers['user-email'] as string;
+
+  // const userEmail = req.user?.email as string;
+
   if (!userEmail) {
     throwError('Missing email. Log in!', 400);
   }

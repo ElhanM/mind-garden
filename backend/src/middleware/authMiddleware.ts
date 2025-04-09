@@ -9,7 +9,7 @@ export const authMiddleware = async (
   next: NextFunction
 ): Promise<void> => {
   if (process.env.NODE_ENV !== 'production') {
-    console.log('Auth middleware skipped in non-production environment');
+    // Auth middleware skipped in non-production environment
     return next();
   }
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getSession } from 'next-auth/react';
+import { getSession, signOut } from 'next-auth/react';
 
 if (!process.env.NEXT_PUBLIC_API_URL) {
   throw new Error(
@@ -11,19 +11,39 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
+// Request Interceptor - attach token
 api.interceptors.request.use(
   async (config) => {
     const session = await getSession();
 
-    if (session?.idToken) {
-      // Use idToken instead of accessToken
+    if (session?.user?.email) {
       config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${session.idToken}`; // Add the idToken here
+      config.headers['user-email'] = session.user.email;
+    }
+
+    if (session?.idToken) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${session.idToken}`;
     }
 
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+// ✅ Response Interceptor - logout on 401
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const status = error?.response?.status;
+
+    if (status === 401) {
+      console.warn('Token expired or unauthorized. Logging out...');
+      await signOut({ callbackUrl: '/' });
+    }
+
+    return Promise.reject(error);
+  }
 );
 
 export default api;
