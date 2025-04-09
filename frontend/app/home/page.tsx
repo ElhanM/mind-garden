@@ -1,34 +1,29 @@
 'use client';
 import { useSession } from 'next-auth/react';
-import Image from 'next/image'; // Import Next.js Image component
+import Image from 'next/image';
 import { CardWithTitle } from '@/components/ui/card-with-title';
 import { AchievementsList } from '@/components/achievements-list';
 import { MoodHistory } from '@/components/mood-history';
 import { PageLayout } from '@/components/page-layout';
 import { WPBar } from '@/components/ui/wp-bar';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import api from '@/app/api-client/axios-config'; //  custom axios with email header
 
 export default function Home() {
   const { data: session } = useSession();
-  const userId = session?.user.id ?? '';
 
-  // Fetch WP status using React Query
   const {
     data: wp = 0,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['wp-status', userId], // Query key includes id for user-specific caching
+    queryKey: ['wp-status', session?.user?.email], // email is still useful for cache key
     queryFn: async () => {
-      if (!userId) throw new Error('User id is required');
-      const response = await axios.get('/api/wp/wp-status', {
-        headers: { 'user-id': userId }, // Assuming user id is available in session
-      });
+      const response = await api.get('/api/wp/wp-status'); // no need to add headers
       return response.data.wp;
     },
-    enabled: !!userId, // Only fetch if id is available
-    refetchOnWindowFocus: true, // Automatically refetch when the window regains focus
+    enabled: !!session?.user?.email,
+    refetchOnWindowFocus: true,
   });
 
   // Determine the bonsai tree level based on WP
