@@ -19,16 +19,17 @@ export const generateAIResponse = async (
   let result = '';
   let buffer = '';
 
-  // Helper function to process a token with optional delay
+  // processing token, ako je null biva \n
   const processToken = async (token: string) => {
-    // Handle empty tokens as line breaks
     const processedToken = token === '' ? '\n' : token;
+
+    console.log('Processed token: ', processedToken);
 
     result += processedToken;
     if (onToken) {
       onToken(processedToken);
-      // Add optional delay for better UX if specified
       if (streamDelay > 0) {
+        //moze se igrat sa streamdelayom
         await new Promise((resolve) => setTimeout(resolve, streamDelay));
       }
     }
@@ -40,30 +41,29 @@ export const generateAIResponse = async (
       if (done) break;
 
       const chunk = decoder.decode(value);
-      // console.log('Decoded chunk:', chunk); // Log the raw chunk received
 
       buffer += chunk;
 
-      const lines = buffer.split('\n');
+      const lines = buffer.split('\n'); //this line fixed the bad markdown distancing, a delimiter of \n
       buffer = lines.pop() || '';
-      // console.log('Remaining buffer:', buffer); // Log the remaining buffer
 
       for (const line of lines) {
-        // console.log('Processing line:', line); // Log each line being processed
-
+        const trimmedLine = line.trim(); // Trim spaces or empty messages
+        if (!trimmedLine) continue;
         if (line.startsWith('data:')) {
-          // Extract content after "data:", handling both formats (with or without space)
           let content;
+          //this cuts the data: prefix that chunks come in
           if (line.startsWith('data: ')) {
-            content = line.substring(6); // Skip "data: "
+            content = line.substring(6); //'data: '
           } else {
-            content = line.substring(5); // Skip "data:"
+            content = line.substring(5); // 'data:'
           }
 
           if (content === '[DONE]') {
-            return result; // Return without appending [DONE]
+            return result; //return without don
           }
           if (content === '[ERROR]') throw new Error('Stream Error from server');
+          console.log('Content', content);
 
           await processToken(content);
         }

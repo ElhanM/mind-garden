@@ -48,13 +48,11 @@ export async function streamChatMessage(req: Request, res: Response) {
       {
         role: 'system',
         content:
-          // 'You are a psychologist AI specialized in mental health and well-being. Only respond within that scope. Use markdown formatting (e.g., **bold**, *italic*, # headings) where appropriate to enhance readability. If asked otherwise, redirect.',
-          'You are a mental wellness assistant.', //ovaj je za test samo, da se ne peglamo sa psihologom
+          'You are a psychologist AI specialized in mental health and well-being. Only respond within that scope. Use markdown formatting (e.g., **bold**, *italic*, # headings) where appropriate to enhance readability. If asked otherwise, redirect.',
       },
       ...limitedMessages, // ovo je tih zadnjih 5
     ];
 
-    // Streaming OpenAI response
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: conversation,
@@ -68,20 +66,26 @@ export async function streamChatMessage(req: Request, res: Response) {
 
     let fullAssistantResponse = '';
 
+    console.log('Streaming started: ');
     for await (const chunk of completion) {
       const content = chunk.choices[0]?.delta?.content || '';
-      process.stdout.write(content); // Write to stdout for debugging
+      process.stdout.write(content); // Debugging
       if (content) {
         fullAssistantResponse += content;
-        res.write(`data: ${content}\n\n`);
+        const lines = content.split('\n');
+        for (const line of lines) {
+          res.write(`data: ${line}\n`);
+        }
+        res.write('\n');
       }
     }
-
     // save
     const assistantMessage = new Chat();
     assistantMessage.user = { id: userId } as User;
     assistantMessage.role = 'assistant';
     assistantMessage.content = fullAssistantResponse;
+    console.log('Assistant response:', fullAssistantResponse);
+
     await chatRepository.save(assistantMessage);
 
     // Remove later myb

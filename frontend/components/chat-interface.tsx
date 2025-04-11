@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send } from 'lucide-react';
+import { Send, ArrowDown } from 'lucide-react';
 import { PageContainer } from './page-container';
 import { generateAIResponse } from '@/app/api-client/ai-chat';
 import type { ChatMessage } from '@/types/Chat';
 import { useSession } from 'next-auth/react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 
 export function ChatInterface() {
   const { data: session } = useSession();
@@ -26,17 +25,16 @@ export function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [autoScroll, setAutoScroll] = useState(true);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      const scrollArea = scrollAreaRef.current;
-      scrollArea.scrollTop = scrollArea.scrollHeight;
+    //autoscroll on every message change
+    if (autoScroll && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-    if (messages.length > 0) {
-      console.log('Latest message content:', messages[messages.length - 1].content);
-    }
-  }, [messages]);
+  }, [messages, autoScroll]);
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -50,23 +48,22 @@ export function ChatInterface() {
     setInput('');
     setIsLoading(true);
 
-    const assistantMessageIndex = messages.length;
     setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
 
     try {
       setIsStreaming(false);
 
       await generateAIResponse(email, input, (token) => {
-        // As soon as we get the first token, we're streaming
         if (!isStreaming) {
           setIsStreaming(true);
-          setIsLoading(false); // Hide the loading indicator
+          setIsLoading(true); // Hide the loading indicator
         }
         // update assistant
         setMessages((prev) => {
           const updated = [...prev];
           const lastIndex = updated.length - 1;
           updated[lastIndex] = {
+            //updated is to append the token to the last (assistant) message
             ...updated[lastIndex],
             content: updated[lastIndex].content + token,
           };
@@ -92,46 +89,31 @@ export function ChatInterface() {
       setIsStreaming(false);
     }
   };
+
+  const scrollToBottom = useCallback(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      setAutoScroll(true);
+      setShowScrollButton(false);
+    }
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    if (scrollAreaRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollAreaRef.current;
+      const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 10;
+
+      setAutoScroll(isAtBottom);
+      setShowScrollButton(!isAtBottom);
+    }
+  }, []);
+
   return (
     <>
-      <div className="prose">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {`# My Awesome Document
-
-## Introduction
-
-This is an introduction to my awesome document. Here are some things we will cover:
-
-- Topic 1
-- Topic 2
-- Topic 3
-
-## Details
-
-### Topic 1
-
-Here are some details about Topic 1.
-
-1. First point
-2. Second point
-3. Third point
-
-### Topic 2
-
-**This is important** information about Topic 2.
-
-- [ ] Task 1
-- [x] Task 2 (completed)
-
-## Conclusion
-
-Thank you for reading!`}
-        </ReactMarkdown>
-      </div>
       <PageContainer className="h-[calc(100vh-8rem)] py-4">
         <>
           <div className="flex h-full flex-col rounded-lg border border-gray-300 bg-white shadow-md">
-            <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+            <ScrollArea className="flex-1 p-4" ref={scrollAreaRef} onScroll={handleScroll}>
               <div className="space-y-4">
                 {messages.map((message, index) => (
                   <div
@@ -149,8 +131,19 @@ Thank you for reading!`}
                     </div>
                   </div>
                 ))}
+                <div ref={messagesEndRef} />
               </div>
             </ScrollArea>
+            {showScrollButton && (
+              <Button
+                className="absolute bottom-20 right-6 rounded-full p-2 shadow-md"
+                onClick={scrollToBottom}
+                size="sm"
+                variant="secondary"
+              >
+                <ArrowDown className="h-4 w-4" />
+              </Button>
+            )}
             <div className="border-t border-gray-300 p-4">
               <form
                 onSubmit={(e) => {
