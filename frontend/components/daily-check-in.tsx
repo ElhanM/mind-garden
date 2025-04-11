@@ -105,7 +105,13 @@ export function DailyCheckIn() {
         description: 'Check-in submitted successfully.',
         variant: 'default',
       });
+
+      // Invalidate today's check-in query
       queryClient.invalidateQueries({ queryKey: ['todayCheckIn'] });
+
+      // Invalidate streaks calendar query (forces it to fetch fresh data)
+      queryClient.invalidateQueries({ queryKey: ['checkIns', email] });
+
       setOpen(false); // Close the dialog immediately
       reset(); // Reset the form
       setSubmitting(false);

@@ -18,8 +18,10 @@ export default function ProfilePage() {
 
   return (
     <PageLayout>
-      <div className="grid gap-6 md:grid-cols-2 items-stretch">
-        <div className="h-fit bg-white p-6 rounded-lg shadow">
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* First row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
+          {/* Personal Information */}
           <CardWithTitle title="Personal Information">
             <div className="mb-6 flex justify-center">
               {isLoading ? (
@@ -56,15 +58,22 @@ export default function ProfilePage() {
               </div>
             </div>
           </CardWithTitle>
-        </div>
-        <div className="space-y-6">
+
+          {/* Your Streaks */}
+
           <CardWithTitle title="Your Streaks">
             <StreaksCalendar />
           </CardWithTitle>
-          <CardWithTitle title="Mood History">
-            <MoodGraph />
-          </CardWithTitle>
         </div>
+
+        {/* Second row - Empty left column */}
+        <div className="hidden md:block">{/* This column is intentionally left empty */}</div>
+
+        {/* Second row - Mood History (right column) */}
+
+        <CardWithTitle title="Mood History">
+          <MoodGraph />
+        </CardWithTitle>
       </div>
     </PageLayout>
   );
