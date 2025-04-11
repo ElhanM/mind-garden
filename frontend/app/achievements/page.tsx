@@ -1,9 +1,8 @@
 import { PageLayout } from '@/components/page-layout';
 import { CardWithTitle } from '@/components/ui/card-with-title';
-import { userAchievements } from '@/hooks/userAchievments';
+import { achievements } from '@/lib/mock-data';
 
 export default function AchievementsPage() {
-  const { achievements } = userAchievements();
   return (
     <PageLayout>
       <CardWithTitle title="Your Achievements">
