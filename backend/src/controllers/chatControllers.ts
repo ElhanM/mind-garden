@@ -20,7 +20,6 @@ export async function streamChatMessage(req: Request, res: Response) {
   }
 
   try {
-    //get id
     const user = await getUserByEmail(email);
     const userId = user?.id;
     if (!userId) throwError('User ID not found', 404);
@@ -58,7 +57,6 @@ export async function streamChatMessage(req: Request, res: Response) {
       stream: true,
     });
 
-    //ovo sam gpto iskr
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -77,7 +75,6 @@ export async function streamChatMessage(req: Request, res: Response) {
         res.write('\n');
       }
     }
-    // save
     const assistantMessage = new Chat();
     assistantMessage.user = { id: userId } as User;
     assistantMessage.role = 'assistant';

@@ -1,4 +1,3 @@
-// chatRoutes.ts
 import express from 'express';
 import { streamChatMessage, deleteChats } from '../controllers/chatControllers';
 
