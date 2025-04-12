@@ -81,9 +81,10 @@ export async function streamChatMessage(req: Request, res: Response) {
         res.write('\n');
       }
     }
-  } catch (error) {
+  } catch {
     res.write('data: [ERROR]\n\n');
     res.end();
+    throwError('Error in streaming response', 500);
   }
   if (fullAssistantResponse.trim()) {
     const assistantMessage = new Chat();
