@@ -10,6 +10,7 @@ import { generateAIResponse } from '@/app/api-client/ai-chat';
 import type { ChatMessage } from '@/types/Chat';
 import { useSession } from 'next-auth/react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export function ChatInterface() {
   const { data: session } = useSession();
@@ -123,7 +124,7 @@ export function ChatInterface() {
                           : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
                     </div>
                   </div>
                 ))}
