@@ -19,51 +19,57 @@ export async function streamChatMessage(req: Request, res: Response) {
     throwError('Email and input are required', 400);
   }
 
+  const user = await getUserByEmail(email);
+  const userId = user?.id;
+  if (!userId) throwError('User ID not found', 404);
+
+  const chatRepository = AppDataSource.getRepository(Chat);
+
+  const userMessage = new Chat();
+  userMessage.user = { id: userId } as User;
+  userMessage.role = 'user';
+  userMessage.content = input;
+  await chatRepository.save(userMessage);
+
+  const messages = await chatRepository.find({
+    where: { user: { id: userId } },
+    order: { created_at: 'ASC' },
+  });
+
+  const limitedMessages = messages.slice(-5).map((msg) => ({
+    role: msg.role as Role,
+    content: msg.content as string,
+  }));
+
+  const conversation: ChatCompletionMessageParam[] = [
+    {
+      role: 'system',
+      content: `
+    You are a compassionate, professional mental health assistant trained in psychology and well-being.
+    
+    Your role is to support users with emotional wellness, stress, anxiety, and related personal challenges. 
+    - Respond with empathy and encouragement.
+    - Avoid medical diagnosis or medication advice.
+    - If the conversation goes off-topic (e.g., tech support, coding, jokes), politely steer it back to mental health.
+
+    Always prioritize the user's emotional safety and provide helpful, kind, and psychologically-informed responses.
+      `.trim(),
+    },
+    ...limitedMessages,
+  ];
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: conversation,
+    stream: true,
+  });
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  let fullAssistantResponse = '';
   try {
-    const user = await getUserByEmail(email);
-    const userId = user?.id;
-    if (!userId) throwError('User ID not found', 404);
-
-    const chatRepository = AppDataSource.getRepository(Chat);
-
-    const userMessage = new Chat();
-    userMessage.user = { id: userId } as User;
-    userMessage.role = 'user';
-    userMessage.content = input;
-    await chatRepository.save(userMessage);
-
-    const messages = await chatRepository.find({
-      where: { user: { id: userId } },
-      order: { created_at: 'ASC' },
-    });
-
-    const limitedMessages = messages.slice(-5).map((msg) => ({
-      role: msg.role as Role,
-      content: msg.content as string,
-    }));
-
-    const conversation: ChatCompletionMessageParam[] = [
-      {
-        role: 'system',
-        content:
-          'You are a psychologist AI specialized in mental health and well-being. Only respond within that scope. Use markdown formatting (e.g., **bold**, *italic*, # headings) where appropriate to enhance readability. If asked otherwise, redirect.',
-      },
-      ...limitedMessages,
-    ];
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: conversation,
-      stream: true,
-    });
-
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-
-    let fullAssistantResponse = '';
-
-    console.log('Streaming started: ');
     for await (const chunk of completion) {
       const content = chunk.choices[0]?.delta?.content || '';
       if (content) {
@@ -75,25 +81,62 @@ export async function streamChatMessage(req: Request, res: Response) {
         res.write('\n');
       }
     }
+  } catch (error) {
+    res.write('data: [ERROR]\n\n');
+    res.end();
+  }
+  if (fullAssistantResponse.trim()) {
     const assistantMessage = new Chat();
     assistantMessage.user = { id: userId } as User;
     assistantMessage.role = 'assistant';
     assistantMessage.content = fullAssistantResponse;
-    console.log('Assistant response:', fullAssistantResponse);
 
     await chatRepository.save(assistantMessage);
-
-    res.write('data: [DONE]\n\n');
-    res.end();
-  } catch (error) {
-    console.error('Streaming error:', error);
-    res.write('data: [ERROR]\n\n');
-    res.end();
   }
+
+  res.write('data: [DONE]\n\n');
+  res.end();
 }
 
+export const getChatHistory = async (req: Request, res: Response) => {
+  const email = req.headers['user-email']; // Extract email from headers
+  const { offset = 0, limit = 20 } = req.query;
+
+  if (typeof email !== 'string' || !email) {
+    throwError('Invalid or missing email!', 400);
+  }
+
+  const emailAssert = email as string;
+  const user = await getUserByEmail(emailAssert);
+  const userId = user?.id;
+
+  if (!user) {
+    throwError('User not found!', 500);
+  }
+
+  const chatRepository = AppDataSource.getRepository(Chat);
+
+  const [messages, total] = await chatRepository.findAndCount({
+    where: { user: { id: userId } },
+    order: { created_at: 'DESC' },
+    skip: Number(offset),
+    take: Number(limit),
+  });
+
+  messages.reverse();
+
+  sendSuccess(res, { messages, total }, 200);
+};
+
 export async function deleteChats(req: Request, res: Response) {
-  const { userId } = req.body;
+  const { email } = req.body;
+
+  const user = await getUserByEmail(email);
+  const userId = user?.id;
+
+  if (!userId) {
+    throwError('User ID required!', 400);
+  }
 
   const chatRepository = AppDataSource.getRepository(Chat);
   await chatRepository.delete({ user: { id: userId } });
