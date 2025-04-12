@@ -99,7 +99,7 @@ export async function streamChatMessage(req: Request, res: Response) {
 }
 
 export const getChatHistory = async (req: Request, res: Response) => {
-  const email = req.headers['user-email']; // Extract email from headers
+  const email = req.headers['user-email'];
   const { offset = 0, limit = 20 } = req.query;
 
   if (typeof email !== 'string' || !email) {
