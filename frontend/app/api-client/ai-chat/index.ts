@@ -2,7 +2,7 @@ export const generateAIResponse = async (
   email: string,
   input: string,
   onToken?: (token: string) => void,
-  streamDelay = 0 // Optional delay in ms between tokens for better UX
+  streamDelay = 0
 ) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat`, {
     method: 'POST',
@@ -19,7 +19,6 @@ export const generateAIResponse = async (
   let result = '';
   let buffer = '';
 
-  // processing token, ako je null biva \n
   const processToken = async (token: string) => {
     const processedToken = token === '' ? '\n' : token;
 
@@ -29,7 +28,6 @@ export const generateAIResponse = async (
     if (onToken) {
       onToken(processedToken);
       if (streamDelay > 0) {
-        //moze se igrat sa streamdelayom
         await new Promise((resolve) => setTimeout(resolve, streamDelay));
       }
     }
@@ -44,23 +42,22 @@ export const generateAIResponse = async (
 
       buffer += chunk;
 
-      const lines = buffer.split('\n'); //this line fixed the bad markdown distancing, a delimiter of \n
+      const lines = buffer.split('\n');
       buffer = lines.pop() || '';
 
       for (const line of lines) {
-        const trimmedLine = line.trim(); // Trim spaces or empty messages
+        const trimmedLine = line.trim();
         if (!trimmedLine) continue;
         if (line.startsWith('data:')) {
           let content;
-          //this cuts the data: prefix that chunks come in
           if (line.startsWith('data: ')) {
-            content = line.substring(6); //'data: '
+            content = line.substring(6);
           } else {
-            content = line.substring(5); // 'data:'
+            content = line.substring(5);
           }
 
           if (content === '[DONE]') {
-            return result; //return without don
+            return result;
           }
           if (content === '[ERROR]') throw new Error('Stream Error from server');
           console.log('Content', content);

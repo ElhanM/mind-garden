@@ -38,7 +38,6 @@ export async function streamChatMessage(req: Request, res: Response) {
       order: { created_at: 'ASC' },
     });
 
-    //ovo je sto smo pricali, zadnjih 5 poruka gleda
     const limitedMessages = messages.slice(-5).map((msg) => ({
       role: msg.role as Role,
       content: msg.content as string,
@@ -50,7 +49,7 @@ export async function streamChatMessage(req: Request, res: Response) {
         content:
           'You are a psychologist AI specialized in mental health and well-being. Only respond within that scope. Use markdown formatting (e.g., **bold**, *italic*, # headings) where appropriate to enhance readability. If asked otherwise, redirect.',
       },
-      ...limitedMessages, // ovo je tih zadnjih 5
+      ...limitedMessages,
     ];
 
     const completion = await openai.chat.completions.create({
@@ -69,7 +68,6 @@ export async function streamChatMessage(req: Request, res: Response) {
     console.log('Streaming started: ');
     for await (const chunk of completion) {
       const content = chunk.choices[0]?.delta?.content || '';
-      process.stdout.write(content); // Debugging
       if (content) {
         fullAssistantResponse += content;
         const lines = content.split('\n');
@@ -88,7 +86,6 @@ export async function streamChatMessage(req: Request, res: Response) {
 
     await chatRepository.save(assistantMessage);
 
-    // Remove later myb
     res.write('data: [DONE]\n\n');
     res.end();
   } catch (error) {

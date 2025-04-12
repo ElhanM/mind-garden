@@ -30,7 +30,6 @@ export function ChatInterface() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    //autoscroll on every message change
     if (autoScroll && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -56,21 +55,18 @@ export function ChatInterface() {
       await generateAIResponse(email, input, (token) => {
         if (!isStreaming) {
           setIsStreaming(true);
-          setIsLoading(true); // Hide the loading indicator
+          setIsLoading(true);
         }
-        // update assistant
         setMessages((prev) => {
           const updated = [...prev];
           const lastIndex = updated.length - 1;
           updated[lastIndex] = {
-            //updated is to append the token to the last (assistant) message
             ...updated[lastIndex],
             content: updated[lastIndex].content + token,
           };
           return updated;
         });
       });
-      // znam da su try catchovi kurati al promjenice se
     } catch (error) {
       console.error('Streaming failed:', error);
       setMessages((prev) => {
