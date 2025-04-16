@@ -27,12 +27,16 @@ export default function Home() {
   });
 
   // Determine the bonsai tree level based on WP
-  const getBonsaiTreeImage = () => {
-    if (wp >= 0 && wp <= 90) return '/BonsaiLevel1.gif';
-    if (wp >= 100 && wp <= 190) return '/BonsaiLevel2.gif';
-    if (wp >= 200 && wp <= 290) return '/BonsaiLevel3.gif';
-    if (wp >= 300 && wp <= 400) return '/BonsaiLevel4.gif';
-    return '/BonsaiLevel4.gif'; // Default to level 4 if WP is out of range, go beyond 400
+  const getBonsaiTreeImage = (wp: number) => {
+    if (wp <= 90) {
+      return '/BonsaiLevel1.gif';
+    } else if (wp <= 190) {
+      return '/BonsaiLevel2.gif';
+    } else if (wp <= 290) {
+      return '/BonsaiLevel3.gif';
+    } else {
+      return '/BonsaiLevel4.gif';
+    }
   };
 
   return (
@@ -42,7 +46,7 @@ export default function Home() {
           {/* Dynamically render the bonsai tree image */}
           <div className="h-[300px] w-full max-w-md md:h-[400px]">
             <Image
-              src={getBonsaiTreeImage()}
+              src={getBonsaiTreeImage(wp)}
               alt="Bonsai Tree"
               width={400}
               height={400}
