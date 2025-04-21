@@ -101,13 +101,14 @@ export async function streamChatMessage(req: Request, res: Response) {
 
 export const getChatHistory = async (req: Request, res: Response) => {
   const email = req.headers['user-email'];
-  const { offset = 0, limit = 20 } = req.query;
+  const offset = parseInt(req.query.offset as string) || 0;
+  const limit = parseInt(req.query.limit as string) || 5;
 
   if (typeof email !== 'string' || !email) {
     throwError('Invalid or missing email!', 400);
   }
-
   const emailAssert = email as string;
+
   const user = await getUserByEmail(emailAssert);
   const userId = user?.id;
 
@@ -120,8 +121,8 @@ export const getChatHistory = async (req: Request, res: Response) => {
   const [messages, total] = await chatRepository.findAndCount({
     where: { user: { id: userId } },
     order: { created_at: 'DESC' },
-    skip: Number(offset),
-    take: Number(limit),
+    skip: offset,
+    take: limit,
   });
 
   messages.reverse();
@@ -131,6 +132,9 @@ export const getChatHistory = async (req: Request, res: Response) => {
 
 export async function deleteChats(req: Request, res: Response) {
   const { email } = req.body;
+  if (!email) {
+    throwError('Email is required!', 400);
+  }
 
   const user = await getUserByEmail(email);
   const userId = user?.id;

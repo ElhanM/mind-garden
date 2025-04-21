@@ -7,12 +7,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, ArrowDown, Trash2 } from 'lucide-react';
 import { PageContainer } from './page-container';
 import { generateAIResponse } from '@/app/api-client/ai-chat';
-import { fetchChatHistory, deleteChatHistory } from '@/app/api-client/ai-chat/chat-history';
 import type { ChatMessage } from '@/types/Chat';
 import { useSession } from 'next-auth/react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import errorCatch from '@/app/api-client/error-message';
 import { toast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -25,59 +23,69 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { set } from 'date-fns';
+import {
+  useChatHistory,
+  useDeleteChatHistory,
+  useAddChatMessage,
+} from '@/app/api-client/ai-chat/use-chat-query';
+import errorCatch from '@/app/api-client/error-message';
 
 export function ChatInterface() {
   const { data: session } = useSession();
   const email = session?.user.email ?? '';
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const wasDeleted = useRef(false);
   const welcomeMessage: ChatMessage = {
     role: 'system',
     content: "Welcome to MindGarden! I'm your mental wellness assistant. How can I help you today?",
   };
 
+  const {
+    data: chatData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingHistory,
+    refetch,
+  } = useChatHistory(email, 20);
+
+  const { addMessage, updateLastMessage } = useAddChatMessage();
+
+  const allMessages = chatData
+    ? chatData.pages
+        .slice()
+        .reverse()
+        .flatMap((page) => page.messages)
+    : [];
+  const messages = [welcomeMessage, ...allMessages];
   useEffect(() => {
-    const loadChatHistory = async () => {
-      if (!email) return;
+    if (!loadMoreRef.current || !hasNextPage) return;
 
-      setIsLoadingHistory(true);
-      try {
-        const history = await fetchChatHistory(email);
-        if (history && history.length > 0) {
-          setMessages(history);
-        } else {
-          setMessages([welcomeMessage]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
         }
-      } catch (error) {
-        if (error instanceof Error) {
-          toast({
-            title: 'Error!',
-            description: error.message,
-            variant: 'destructive',
-          });
-        }
-        setMessages([welcomeMessage]);
-      } finally {
-        setIsLoadingHistory(false);
-      }
-    };
+      },
+      { threshold: 0.5 }
+    );
 
-    loadChatHistory();
-  }, [email]);
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   useEffect(() => {
-    if (autoScroll && messagesEndRef.current && !isLoadingHistory) {
+    if (autoScroll && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, autoScroll, isLoadingHistory]);
+  }, [messages, autoScroll]);
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -87,11 +95,12 @@ export function ChatInterface() {
     }
 
     const userMessage: ChatMessage = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    addMessage(email, userMessage);
     setInput('');
     setIsLoading(true);
 
-    setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
+    const assistantMessage: ChatMessage = { role: 'assistant', content: '' };
+    addMessage(email, assistantMessage);
 
     try {
       setIsStreaming(false);
@@ -101,55 +110,53 @@ export function ChatInterface() {
           setIsStreaming(true);
           setIsLoading(true);
         }
-        setMessages((prev) => {
-          const updated = [...prev];
-          const lastIndex = updated.length - 1;
-          updated[lastIndex] = {
-            ...updated[lastIndex],
-            content: updated[lastIndex].content + token,
-          };
-          return updated;
-        });
+        updateLastMessage(email, token);
       });
     } catch (error) {
-      console.error('Streaming failed:', error);
-      setMessages((prev) => {
-        const updated = [...prev];
-        const lastIndex = updated.length - 1;
-        if (updated[lastIndex].role === 'assistant' && updated[lastIndex].content === '') {
-          updated[lastIndex] = {
-            ...updated[lastIndex],
-            content: 'Sorry, there was an error processing your request.',
-          };
-        }
-        return updated;
-      });
+      updateLastMessage(email, 'Sorry, there was an error processing your request.');
     } finally {
       setIsLoading(false);
       setIsStreaming(false);
+      refetch();
     }
   };
 
-  const handleDeleteChats = async () => {
-    if (!email) return;
+  const mutation = useDeleteChatHistory();
 
+  const handleDeleteChats = () => {
     setIsLoading(true);
-    try {
-      const success = await deleteChatHistory(email);
-      if (success) {
-        setMessages([
-          {
-            role: 'system',
-            content:
-              "Welcome to MindGarden! I'm your mental wellness assistant. How can I help you today?",
-          },
-        ]);
-      }
-    } catch (error) {
-      console.error('Failed to delete chat history:', error);
-    } finally {
-      setIsLoading(false);
-    }
+
+    mutation.mutate(email, {
+      onSuccess: (result) => {
+        if (result.success) {
+          toast({
+            title: 'Success!',
+            description: result.message,
+            variant: 'default',
+          });
+          wasDeleted.current = true;
+        } else {
+          toast({
+            title: 'Unexpected result',
+            description: 'The operation did not complete successfully.',
+            variant: 'destructive',
+          });
+        }
+
+        setIsLoading(false);
+      },
+      onError: (error: Error) => {
+        const errorMessage = errorCatch(error);
+
+        toast({
+          title: 'Error!',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+
+        setIsLoading(false);
+      },
+    });
   };
 
   const scrollToBottom = useCallback(() => {
@@ -185,14 +192,14 @@ export function ChatInterface() {
                     className="text-red-500 hover:bg-red-50 hover:text-red-600"
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
-                    Delete Chats
+                    Restart Chats
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action will delete all your chat messages. This action cannot be undone.
+                      This action will restart all your chat messages. This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -201,7 +208,7 @@ export function ChatInterface() {
                       onClick={handleDeleteChats}
                       className="bg-red-500 hover:bg-red-600"
                     >
-                      Delete
+                      Restart
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -209,12 +216,25 @@ export function ChatInterface() {
             </div>
 
             <ScrollArea className="flex-1 p-4" ref={scrollAreaRef} onScroll={handleScroll}>
-              {isLoadingHistory ? (
+              {isLoadingHistory && !messages.length ? (
                 <div className="flex justify-center items-center h-full">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
                 </div>
               ) : (
                 <div className="space-y-4">
+                  {/* Load more trigger at the top */}
+                  {hasNextPage && (
+                    <div ref={loadMoreRef} className="flex justify-center py-2">
+                      {isFetchingNextPage ? (
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600"></div>
+                      ) : (
+                        <span className="text-sm text-gray-500">
+                          Scroll up to load more messages
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   {messages.map((message, index) => (
                     <div
                       key={index}

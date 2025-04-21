@@ -4,8 +4,7 @@ import { streamChatMessage, deleteChats, getChatHistory } from '../controllers/c
 const router = express.Router();
 
 router.post('/', streamChatMessage);
-router.delete('/', deleteChats);
 router.get('/history/', getChatHistory);
-router.get('/history/delete', getChatHistory);
+router.delete('/history/delete', deleteChats);
 
 export default router;
