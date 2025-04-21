@@ -17,7 +17,7 @@ MindGarden is a cutting-edge mental wellness platform that combines **AI-powered
 - ✅ **Leverage Positive Reinforcement** – **Dopamine and endorphin-releasing achievements** make users feel rewarded, fostering long-term mental wellness habits.
 - ✅ **Support Personal Growth** – A **growing bonsai tree** represents a user’s mental health journey, reinforcing mindfulness, perseverance, and achievement.
 
-## 🌟 Why MindGarden?
+## 🌟 Why MindGarden? 
 
 🚀 Mental health improvement is a **long-term journey**, often overlooked in today’s fast-paced digital world. MindGarden simplifies self-care with an **intuitive and engaging experience**, avoiding passive scrolling and promoting meaningful interaction.
 

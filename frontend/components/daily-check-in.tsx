@@ -51,7 +51,6 @@ export function DailyCheckIn() {
   const email = session?.user.email ?? '';
   let hasCheckedInToday = false;
 
-  // Query to check if user already checked in today
   const {
     data: todayCheckIn,
     isLoading: checkInLoading,
@@ -60,10 +59,9 @@ export function DailyCheckIn() {
   } = useQuery({
     queryKey: ['todayCheckIn'],
     queryFn: () => (email ? fetchTodayCheckIn(email) : Promise.resolve(null)),
-    enabled: !!email, // Only fetch if userId exists
+    enabled: !!email,
   });
 
-  //same structure as the onError.
   if (isError) {
     const errorMessage = errorCatch(error);
 
@@ -78,7 +76,6 @@ export function DailyCheckIn() {
     ? (hasCheckedInToday = compareDatesWithoutTimestamp(todayCheckIn?.createdAt))
     : (hasCheckedInToday = false);
 
-  // Form setup with validation
   const {
     control,
     handleSubmit,
@@ -93,7 +90,6 @@ export function DailyCheckIn() {
     },
   });
 
-  // Mutation for submitting check-in
   const checkInMutation = useMutation({
     mutationFn: (formData: CheckInFormData) => {
       if (!email) throw new Error('User email is required');
@@ -106,17 +102,15 @@ export function DailyCheckIn() {
         variant: 'default',
       });
 
-      // Invalidate today's check-in query
       queryClient.invalidateQueries({ queryKey: ['todayCheckIn'] });
 
-      // Invalidate streaks calendar query (forces it to fetch fresh data)
       queryClient.invalidateQueries({ queryKey: ['checkIns', email] });
 
-      setOpen(false); // Close the dialog immediately
-      reset(); // Reset the form
+      setOpen(false);
+      reset();
       setSubmitting(false);
     },
-    onError: (error: unknown) => {
+    onError: (error: Error) => {
       const errorMessage = errorCatch(error);
 
       toast({
@@ -129,7 +123,6 @@ export function DailyCheckIn() {
     },
   });
 
-  // Handle form submission
   const onSubmit = (data: CheckInFormData) => {
     if (!email) {
       toast({
@@ -148,7 +141,7 @@ export function DailyCheckIn() {
       <DialogTrigger asChild>
         <Button
           className="bg-purple-600 hover:bg-purple-700"
-          disabled={!email || checkInLoading || hasCheckedInToday} // Disable if userId is null or data is loading
+          disabled={!email || checkInLoading || hasCheckedInToday}
         >
           {checkInLoading || !email ? (
             <>
