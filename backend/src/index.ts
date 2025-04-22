@@ -7,6 +7,7 @@ import { AppDataSource } from './data-source';
 // Import your routes
 import dailyCheckInRoutes from './routes/dailyCheckInRoutes';
 import wpRoutes from './routes/wpRoutes'; // Add wp router
+import chatRoutes from './routes/chatRoutes'; // Add chat router
 
 // Initialize database connection
 AppDataSource.initialize()
@@ -27,6 +28,7 @@ app.use(express.json());
 // Routes
 app.use('/api/check-ins', dailyCheckInRoutes);
 app.use('/api/wp', wpRoutes); // Add this route
+app.use('/api/chat', chatRoutes); // Add chat route
 
 // Error handler - MUST be after all routes and middleware
 app.use(errorHandler);
