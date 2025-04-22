@@ -15,16 +15,12 @@ export const getWPStatus = async (req: Request, res: Response) => {
 
   const checkIns = await dailyCheckInRepository.find({
     where: { userId },
+    order: { createdAt: 'ASC' },
   });
-
-  // Sort check-ins to find first date
-  const sortedCheckIns = checkIns.sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-  );
 
   const checkInDates = checkIns.map((checkIn) => format(new Date(checkIn.createdAt), 'yyyy-MM-dd'));
 
-  const startDate = sortedCheckIns.length > 0 ? new Date(sortedCheckIns[0].createdAt) : new Date();
+  const startDate = checkIns.length > 0 ? new Date(checkIns[0].createdAt) : new Date();
   const endDate = new Date(); // Always use today
 
   const wp = calculateWP(checkInDates, startDate, endDate);
