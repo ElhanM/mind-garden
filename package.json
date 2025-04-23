@@ -16,6 +16,7 @@
     "npm": "10.9.2"
   },
   "dependencies": {
+    "@tailwindcss/typography": "^0.5.16",
     "date-fns": "^4.1.0"
   }
 }
