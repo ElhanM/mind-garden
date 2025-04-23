@@ -18,36 +18,33 @@ export const authMiddleware = async (
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throwError('Missing or invalid token', 401);
-    return; // exit early without calling next()
   }
 
-  const token = authHeader.split(' ')[1];
+  const token = authHeader?.split(' ')[1];
+  if (!token) {
+    throwError('Missing or invalid token', 401);
+  }
 
-  // Validate the token format (basic check for segments)
-  const tokenSegments = token.split('.');
+  const tokenSegments = token?.split('.') || [];
   if (tokenSegments.length !== 3) {
     throwError('Invalid token format', 401);
   }
-  // Verify the token with Google
+
   const ticket = await client.verifyIdToken({
-    idToken: token,
+    idToken: token as string,
     audience: process.env.GOOGLE_ID,
   });
 
   const payload = ticket.getPayload();
 
-  // If no email in the payload, reject the request
   if (!payload?.email) {
     throwError('Invalid token, no email found', 401);
-    return; // exit early without calling next()
   }
 
-  // Attach the user email and name to the request object
   req.user = {
-    email: payload.email,
-    name: payload.name,
+    email: payload?.email || '',
+    name: payload?.name || '',
   };
 
-  // Continue to the next middleware or route handler
   next();
 };
