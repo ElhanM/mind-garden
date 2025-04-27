@@ -33,11 +33,7 @@ function getStreakDate(
   return null;
 }
 
-export const getAchievements = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+export const getAchievements = async (req: Request, res: Response): Promise<void> => {
   const email = req.headers['user-email'] as string;
   if (!email) {
     throwError('Missing email. Log in!', 400);
