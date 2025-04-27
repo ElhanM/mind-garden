@@ -1,7 +1,6 @@
 import api from '../axios-config';
 import type { CheckInFormData } from '../../../validation/check-in-schema';
 
-// Function to check if user has already checked in today
 export const fetchTodayCheckIn = async (email: string | null) => {
   if (!email) return null;
 
