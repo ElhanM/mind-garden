@@ -8,7 +8,7 @@ export enum AchievementIcon {
   MoodBoosterPro = 5,
 }
 
-export const achievementIcons: { [key in AchievementIcon]: JSX.Element } = {
+export const achievementIcons = {
   [AchievementIcon.FirstCheckIn]: <Star className="h-5 w-5 text-yellow-500" />,
   [AchievementIcon.SevenDayStreak]: <Target className="h-5 w-5 text-blue-500" />,
   [AchievementIcon.ConsistencyChampion]: <Trophy className="h-5 w-5 text-green-500" />,

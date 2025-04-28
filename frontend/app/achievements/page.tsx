@@ -4,7 +4,7 @@ import { CardWithTitle } from '@/components/ui/card-with-title';
 import { useState, useEffect } from 'react';
 import { fetchAchievements } from '../api-client/achievements';
 import { useSession } from 'next-auth/react';
-import { achievementIcons } from '../api-client/achievements/achievementIcons';
+import { AchievementIcon, achievementIcons } from '../api-client/achievements/achievementIcons';
 
 export default function AchievementsPage() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -68,7 +68,7 @@ export default function AchievementsPage() {
               }`}
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
-                {achievementIcons[achievement.id as keyof typeof achievementIcons]}
+                {achievementIcons[achievement.id as AchievementIcon]}
               </div>
               <div className="flex-1">
                 <h3 className="font-medium text-gray-900">{achievement.title}</h3>
