@@ -33,7 +33,24 @@ export default function AchievementsPage() {
     return (
       <PageLayout>
         <CardWithTitle title="Your Achievements">
-          <div className="text-center text-gray-500">Loading achievements...</div>
+          <div className="space-y-4">
+            {/* Default to 5 skeleton loaders */}
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="flex items-center gap-4 rounded-lg p-3 transition-colors">
+                {/* Skeleton for the icon */}
+                <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse"></div>
+
+                {/* Skeleton for title and description */}
+                <div className="flex-1">
+                  <div className="h-4 w-1/3 bg-gray-200 rounded animate-pulse mb-2"></div>
+                  <div className="h-3 w-2/3 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+
+                {/* Skeleton for the date */}
+                <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            ))}
+          </div>
         </CardWithTitle>
       </PageLayout>
     );
@@ -51,7 +68,7 @@ export default function AchievementsPage() {
               }`}
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
-                {achievementIcons[achievement.id]}
+                {achievementIcons[achievement.id as keyof typeof achievementIcons]}
               </div>
               <div className="flex-1">
                 <h3 className="font-medium text-gray-900">{achievement.title}</h3>

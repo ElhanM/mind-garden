@@ -47,7 +47,7 @@ export const getAchievements = async (req: Request, res: Response): Promise<void
     journalEntry: string;
   }>;
 
-  const achievement1: Achievement = {
+  const firstSteps: Achievement = {
     id: 1,
     title: 'First Steps',
     description: 'Complete your first check-in',
@@ -56,7 +56,7 @@ export const getAchievements = async (req: Request, res: Response): Promise<void
   };
 
   const unlockWeekWarrior = getStreakDate(checkIns, 7);
-  const achievement2: Achievement = {
+  const weekWarrior: Achievement = {
     id: 2,
     title: 'Week Warrior',
     description: 'Complete 7 consecutive daily check-ins',
@@ -64,7 +64,7 @@ export const getAchievements = async (req: Request, res: Response): Promise<void
     date: unlockWeekWarrior,
   };
 
-  const achievement3: Achievement = {
+  const mindfullnessMaster: Achievement = {
     id: 3,
     title: 'Mindfulness Master',
     description: 'Complete 30 daily check-ins',
@@ -77,7 +77,7 @@ export const getAchievements = async (req: Request, res: Response): Promise<void
       return { journalEntry: checkIn.journalEntry, createdAt: checkIn.createdAt };
     }
   );
-  const achievement4: Achievement = {
+  const reflectionGuru: Achievement = {
     id: 4,
     title: 'Reflection Guru',
     description: 'Write 10 journal entries',
@@ -91,7 +91,7 @@ export const getAchievements = async (req: Request, res: Response): Promise<void
       return { checkInDate: checkIn.checkInDate, createdAt: checkIn.createdAt };
     });
   const unlockMood = getStreakDate(positiveCheckIns, 5);
-  const achievement5: Achievement = {
+  const selfCareChampion: Achievement = {
     id: 5,
     title: 'Self-Care Champion',
     description: 'Report 5 consecutive days of positive mood',
@@ -99,7 +99,13 @@ export const getAchievements = async (req: Request, res: Response): Promise<void
     date: unlockMood,
   };
 
-  const achievements = [achievement1, achievement2, achievement3, achievement4, achievement5];
+  const achievements = [
+    firstSteps,
+    weekWarrior,
+    mindfullnessMaster,
+    reflectionGuru,
+    selfCareChampion,
+  ];
 
   sendSuccess(res, { achievements }, 200);
 };

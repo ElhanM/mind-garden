@@ -1,15 +1,18 @@
 import api from '../axios-config';
 export async function fetchAchievements(email: string) {
-  if (!email) {
-    throw new Error('Missing email. Log in!');
-  }
   const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/api/achievements/`, {
     headers: {
       'user-email': email,
     },
   });
+
   if (response.data.success !== true) {
-    throw new Error(response.data.message);
+    throw new Error(response.data.message || 'Failed to fetch achievements');
   }
+
+  if (!response.data.results || !Array.isArray(response.data.results.achievements)) {
+    throw new Error(response.data.message || 'Invalid response format');
+  }
+
   return response.data.results;
 }
