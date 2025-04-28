@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { fetchCheckInsForUser } from './dailyCheckInController';
 import { sendSuccess, throwError } from '../utils/responseHandlers';
 import { Achievement } from '../types/Achievement';
