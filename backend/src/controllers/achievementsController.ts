@@ -14,6 +14,7 @@ function getStreakDate(
   );
 
   let streak = 1;
+  let earliestStreakDate: string | null = null;
 
   for (let i = 1; i < sortedRecords.length; i++) {
     const prevDate = new Date(sortedRecords[i - 1].checkInDate);
@@ -23,14 +24,18 @@ function getStreakDate(
 
     if (diffDays === 1) {
       streak++;
-      if (streak === requiredStreak) {
-        return sortedRecords[i].createdAt.toISOString();
+      if (streak >= requiredStreak) {
+        const currentStreakEndDate = sortedRecords[i].createdAt.toISOString();
+        if (!earliestStreakDate || currentStreakEndDate < earliestStreakDate) {
+          earliestStreakDate = currentStreakEndDate;
+        }
       }
     } else if (diffDays > 1) {
       streak = 1;
     }
   }
-  return null;
+
+  return earliestStreakDate;
 }
 
 export const getAchievements = async (req: Request, res: Response): Promise<void> => {
@@ -72,11 +77,12 @@ export const getAchievements = async (req: Request, res: Response): Promise<void
     date: checkIns.length >= 30 ? new Date(checkIns[29].createdAt).toISOString() : null,
   };
 
-  const journalEntries: Array<{ journalEntry: string; createdAt: Date }> = checkIns.map(
-    (checkIn) => {
-      return { journalEntry: checkIn.journalEntry, createdAt: checkIn.createdAt };
-    }
-  );
+  const journalEntries: Array<{ journalEntry: string; createdAt: Date }> = checkIns
+    .filter((checkIn) => checkIn.journalEntry) // Only count non-empty journal entries
+    .map((checkIn) => ({
+      journalEntry: checkIn.journalEntry,
+      createdAt: checkIn.createdAt,
+    }));
   const reflectionGuru: Achievement = {
     id: 4,
     title: 'Reflection Guru',
@@ -87,9 +93,10 @@ export const getAchievements = async (req: Request, res: Response): Promise<void
 
   const positiveCheckIns: Array<{ checkInDate: Date; createdAt: Date }> = checkIns
     .filter((checkIn) => ['great', 'good'].includes(checkIn.mood.toLowerCase()))
-    .map((checkIn) => {
-      return { checkInDate: checkIn.checkInDate, createdAt: checkIn.createdAt };
-    });
+    .map((checkIn) => ({
+      checkInDate: checkIn.checkInDate,
+      createdAt: checkIn.createdAt,
+    }));
   const unlockMood = getStreakDate(positiveCheckIns, 5);
   const selfCareChampion: Achievement = {
     id: 5,
