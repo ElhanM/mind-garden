@@ -1,4 +1,4 @@
-import { eachDayOfInterval, format } from 'date-fns';
+import { eachDayOfInterval, format, isToday } from 'date-fns';
 
 // Helper function to calculate WP
 export const calculateWP = (checkInDates: string[], startDate: Date, endDate: Date): number => {
@@ -7,6 +7,12 @@ export const calculateWP = (checkInDates: string[], startDate: Date, endDate: Da
 
   allDates.forEach((date) => {
     const formattedDate = format(date, 'yyyy-MM-dd');
+
+    // Skip decrementing for today if the user hasn't checked in yet
+    if (isToday(date) && !checkInDates.includes(formattedDate)) {
+      return;
+    }
+
     if (checkInDates.includes(formattedDate)) {
       wp += 10; // Real check-in
     } else {

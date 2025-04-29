@@ -6,15 +6,15 @@ import { calculateWP } from './wpHelperCalculation'; // Import the helper functi
 import { format } from 'date-fns';
 
 export const getWPStatus = async (req: Request, res: Response) => {
-  const userId = parseInt(req.headers['user-id'] as string, 10);
-  if (!userId) {
-    throwError('Missing user ID. Log in!', 400);
+  const userEmail = req.headers['user-email'] as string;
+  if (!userEmail) {
+    throwError('Missing user email. Log in!', 400);
   }
 
   const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
 
   const checkIns = await dailyCheckInRepository.find({
-    where: { userId },
+    where: { user: { email: userEmail } },
     order: { createdAt: 'ASC' },
   });
 
@@ -24,6 +24,7 @@ export const getWPStatus = async (req: Request, res: Response) => {
   const endDate = new Date(); // Always use today
 
   const wp = calculateWP(checkInDates, startDate, endDate);
+  console.log('WP:', wp);
 
   sendSuccess(res, { wp }, 200);
 };

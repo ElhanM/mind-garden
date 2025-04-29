@@ -106,6 +106,8 @@ export function DailyCheckIn() {
 
       queryClient.invalidateQueries({ queryKey: ['checkIns', email] });
 
+      queryClient.invalidateQueries({ queryKey: ['wp-status', email] });
+
       setOpen(false);
       reset();
       setSubmitting(false);

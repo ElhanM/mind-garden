@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.16",
-    "date-fns": "^4.1.0"
+    "date-fns": "^4.1.0",
+    "react-loading-skeleton": "^3.5.0"
   }
 }
