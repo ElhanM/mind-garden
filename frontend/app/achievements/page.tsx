@@ -2,51 +2,47 @@
 import { PageLayout } from '@/components/page-layout';
 import { CardWithTitle } from '@/components/ui/card-with-title';
 import { useState, useEffect } from 'react';
-import { fetchAchievements } from '../api-client/achievements';
+import { useAchievementsQuery } from '../api-client/achievements';
 import { useSession } from 'next-auth/react';
 import { AchievementIcon, achievementIcons } from '../api-client/achievements/achievementIcons';
+import { toast } from '@/hooks/use-toast';
 
 export default function AchievementsPage() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
   const email = session?.user.email ?? '';
+  const { data, isError, error } = useAchievementsQuery(email);
 
   useEffect(() => {
-    async function loadAchievements(email: string) {
-      try {
-        const results = await fetchAchievements(email);
-        console.log('Fetched achievements:', results);
-
-        setAchievements(results.achievements);
-      } catch (error) {
-        console.error('Error loading achievements:', error);
-      } finally {
-        setLoading(false);
-      }
+    if (data) {
+      setAchievements(data.achievements);
+      setLoading(false);
+    } else if (isError && error instanceof Error) {
+      toast({
+        title: 'Error!',
+        description: error.message,
+        variant: 'destructive',
+      });
+      setAchievements([]);
+      setLoading(false);
     }
-
-    loadAchievements(email);
-  }, []);
+  }, [data, isError, error]);
 
   if (loading) {
     return (
       <PageLayout>
         <CardWithTitle title="Your Achievements">
           <div className="space-y-4">
-            {/* Default to 5 skeleton loaders */}
             {Array.from({ length: 5 }).map((_, index) => (
               <div key={index} className="flex items-center gap-4 rounded-lg p-3 transition-colors">
-                {/* Skeleton for the icon */}
                 <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse"></div>
 
-                {/* Skeleton for title and description */}
                 <div className="flex-1">
                   <div className="h-4 w-1/3 bg-gray-200 rounded animate-pulse mb-2"></div>
                   <div className="h-3 w-2/3 bg-gray-200 rounded animate-pulse"></div>
                 </div>
 
-                {/* Skeleton for the date */}
                 <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
               </div>
             ))}
@@ -60,6 +56,10 @@ export default function AchievementsPage() {
     <PageLayout>
       <CardWithTitle title="Your Achievements">
         <div className="space-y-4">
+          {achievements.length === 0 && (
+            <div className="text-sm text-red-500">Achievements could not be fetched.</div>
+          )}
+
           {achievements.map((achievement) => (
             <div
               key={achievement.id}

@@ -1,5 +1,7 @@
+import { useQuery } from '@tanstack/react-query';
 import api from '../axios-config';
-export async function fetchAchievements(email: string) {
+
+async function fetchAchievements(email: string) {
   const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/api/achievements/`, {
     headers: {
       'user-email': email,
@@ -15,4 +17,12 @@ export async function fetchAchievements(email: string) {
   }
 
   return response.data.results;
+}
+
+export function useAchievementsQuery(email: string) {
+  return useQuery({
+    queryKey: ['achievements', email],
+    queryFn: () => fetchAchievements(email),
+    enabled: !!email,
+  });
 }
