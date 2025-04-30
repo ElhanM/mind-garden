@@ -64,7 +64,7 @@ export default function Home() {
           ) : (
             <Skeleton className="h-[106px] w-[448px] rounded-lg mx-auto mt-6" />
           )}
-          <div className="mt-10 w-full max-w-md rounded-lg border border-gray-200 bg-amber-50 p-4 text-sm shadow-sm">
+          <div className="mt-10 w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 text-sm shadow-sm">
             <div className="mb-2 font-medium text-amber-800">Tree Levels</div>
             <div className="grid grid-cols-1 gap-1">
               <div className="flex justify-between">
