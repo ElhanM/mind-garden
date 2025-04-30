@@ -7,6 +7,7 @@ import { AppDataSource } from './data-source';
 // Import your routes
 import dailyCheckInRoutes from './routes/dailyCheckInRoutes';
 import chatRoutes from './routes/chatRoutes';
+import achievementRoutes from './routes/achievementRoutes';
 
 // Initialize database connection
 AppDataSource.initialize()
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use('/api/check-ins', dailyCheckInRoutes);
 // Add other routes here
 app.use('/api/chat', chatRoutes);
+app.use('/api/achievements', achievementRoutes);
 
 // Error handler - MUST be after all routes and middleware
 app.use(errorHandler);
