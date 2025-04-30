@@ -6,6 +6,7 @@ import { useAchievementsQuery } from '../api-client/achievements';
 import { useSession } from 'next-auth/react';
 import { AchievementIcon, achievementIcons } from '../api-client/achievements/achievementIcons';
 import { toast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AchievementsPage() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -36,14 +37,14 @@ export default function AchievementsPage() {
           <div className="space-y-4">
             {Array.from({ length: 5 }).map((_, index) => (
               <div key={index} className="flex items-center gap-4 rounded-lg p-3 transition-colors">
-                <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse"></div>
+                <Skeleton className="h-10 w-10 rounded-full" />
 
                 <div className="flex-1">
-                  <div className="h-4 w-1/3 bg-gray-200 rounded animate-pulse mb-2"></div>
-                  <div className="h-3 w-2/3 bg-gray-200 rounded animate-pulse"></div>
+                  <Skeleton className="h-4 w-1/3 mb-2" />
+                  <Skeleton className="h-3 w-2/3" />
                 </div>
 
-                <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
+                <Skeleton className="h-3 w-16" />
               </div>
             ))}
           </div>
