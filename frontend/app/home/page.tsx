@@ -17,7 +17,6 @@ export default function Home() {
     queryKey: ['wp-status', session?.user?.email],
     queryFn: async () => {
       const response = await api.get('/api/wp/wp-status');
-      console.log('API Response:', response.data);
       return response.data.results.wp;
     },
     enabled: !!session?.user?.email,
@@ -67,22 +66,37 @@ export default function Home() {
           <div className="mt-10 w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 text-sm shadow-sm">
             <div className="mb-2 font-medium text-amber-800">Tree Levels</div>
             <div className="grid grid-cols-1 gap-1">
-              <div className="flex justify-between">
-                <span className="text-amber-700">Level 1:</span>
-                <span className="text-amber-600">0-90 WP</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-amber-700">Level 2:</span>
-                <span className="text-amber-600">100-190 WP</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-amber-700">Level 3:</span>
-                <span className="text-amber-600">200-290 WP</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-amber-700">Level 4:</span>
-                <span className="text-amber-600">300-400 WP</span>
-              </div>
+              {[
+                {
+                  level: 'Level 1',
+                  range: '0-90 WP',
+                  levelColor: 'text-amber-700',
+                  rangeColor: 'text-amber-600',
+                },
+                {
+                  level: 'Level 2',
+                  range: '100-190 WP',
+                  levelColor: 'text-amber-700',
+                  rangeColor: 'text-amber-600',
+                },
+                {
+                  level: 'Level 3',
+                  range: '200-290 WP',
+                  levelColor: 'text-amber-700',
+                  rangeColor: 'text-amber-600',
+                },
+                {
+                  level: 'Level 4',
+                  range: '300-400 WP',
+                  levelColor: 'text-amber-700',
+                  rangeColor: 'text-amber-600',
+                },
+              ].map((item, index) => (
+                <div key={index} className="flex justify-between">
+                  <span className={item.levelColor}>{item.level}:</span>
+                  <span className={item.rangeColor}>{item.range}</span>
+                </div>
+              ))}
             </div>
           </div>
         </section>
