@@ -2,11 +2,6 @@ import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-q
 import api from '../axios-config';
 import type { ChatMessage } from '@/types/Chat';
 
-interface ChatHistoryResponse {
-  messages: ChatMessage[];
-  total: number;
-}
-
 export const useChatHistory = (email: string, limit = 5) => {
   return useInfiniteQuery({
     queryKey: ['chatHistory', email],
@@ -20,8 +15,6 @@ export const useChatHistory = (email: string, limit = 5) => {
           limit,
         },
       });
-      console.log('Fetching page with offset:', pageParam);
-      console.log('Response:', response.data);
 
       if (response.data.success !== true) {
         throw new Error(response.data.message);

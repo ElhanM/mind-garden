@@ -8,6 +8,7 @@ import { AppDataSource } from './data-source';
 import dailyCheckInRoutes from './routes/dailyCheckInRoutes';
 import wpRoutes from './routes/wpRoutes'; // Add wp router
 import chatRoutes from './routes/chatRoutes'; // Add chat router
+import achievementRoutes from './routes/achievementRoutes';
 
 // Initialize database connection
 AppDataSource.initialize()
@@ -29,6 +30,8 @@ app.use(express.json());
 app.use('/api/check-ins', dailyCheckInRoutes);
 app.use('/api/wp', wpRoutes); // Add this route
 app.use('/api/chat', chatRoutes); // Add chat route
+// Add other routes here
+app.use('/api/achievements', achievementRoutes);
 
 // Error handler - MUST be after all routes and middleware
 app.use(errorHandler);

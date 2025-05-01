@@ -108,6 +108,8 @@ export function DailyCheckIn() {
 
       queryClient.invalidateQueries({ queryKey: ['wp-status', email] });
 
+      queryClient.invalidateQueries({ queryKey: ['achievements', email] });
+
       setOpen(false);
       reset();
       setSubmitting(false);
