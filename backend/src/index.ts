@@ -1,12 +1,13 @@
-// backend/src/index.ts
 import 'express-async-errors'; // This must be the first import!
 import express from 'express';
 import cors from 'cors';
 import { errorHandler } from './middleware/errorMiddleware';
 import { AppDataSource } from './data-source';
+
 // Import your routes
 import dailyCheckInRoutes from './routes/dailyCheckInRoutes';
-import chatRoutes from './routes/chatRoutes';
+import wpRoutes from './routes/wpRoutes'; // Add wp router
+import chatRoutes from './routes/chatRoutes'; // Add chat router
 import achievementRoutes from './routes/achievementRoutes';
 
 // Initialize database connection
@@ -27,8 +28,9 @@ app.use(express.json());
 
 // Routes
 app.use('/api/check-ins', dailyCheckInRoutes);
+app.use('/api/wp', wpRoutes); // Add this route
+app.use('/api/chat', chatRoutes); // Add chat route
 // Add other routes here
-app.use('/api/chat', chatRoutes);
 app.use('/api/achievements', achievementRoutes);
 
 // Error handler - MUST be after all routes and middleware
