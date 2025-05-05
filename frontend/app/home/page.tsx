@@ -23,8 +23,6 @@ export default function Home() {
     refetchOnWindowFocus: true,
   });
 
-  const wp = data || 0; // Default to 0 if data is undefined
-
   // Determine the bonsai tree level based on WP
   const getBonsaiTreeImage = (wp: number) => {
     if (wp <= 90) {
@@ -44,7 +42,7 @@ export default function Home() {
         <section className="flex flex-col items-center justify-center">
           {/* Dynamically render the bonsai tree image */}
           <div className="h-[300px] w-full max-w-md md:h-[400px]">
-            {!isLoading && data ? (
+            {!isLoading && data !== undefined ? (
               <Image
                 src={getBonsaiTreeImage(data)}
                 alt="Bonsai Tree"
@@ -58,7 +56,7 @@ export default function Home() {
           </div>
 
           {/* Pass the dynamically updated WP to WPBar */}
-          {!isLoading && data ? (
+          {!isLoading && data !== undefined ? (
             <WPBar wp={data} />
           ) : (
             <Skeleton className="h-[106px] w-[448px] rounded-lg mx-auto mt-6" />
