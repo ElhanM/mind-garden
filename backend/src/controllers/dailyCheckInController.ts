@@ -109,3 +109,54 @@ export const fetchCheckInsForUser = async (email: string) => {
 
   return checkIns;
 };
+
+export const getLatestStreak = async (req: Request, res: Response) => {
+  const userEmail = req.headers['user-email'] as string;
+  if (!userEmail) {
+    throwError('Missing email. Log in!', 400);
+  }
+
+  const user = await getUserByEmail(userEmail);
+  const userId = user?.id;
+
+  if (!userId) {
+    throwError('User not found', 404);
+  }
+
+  const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
+
+  // Get all check-ins for the user, ordered from newest to oldest
+  const checkIns = await dailyCheckInRepository.find({
+    where: { userId },
+    order: { createdAt: 'DESC' }, // Ordering from latest to earliest
+  });
+
+  // Calculate streak from check-ins
+  const streak = calculateStreak(checkIns);
+
+  sendSuccess(res, { streak }, 200);
+};
+
+const calculateStreak = (checkIns: DailyCheckIn[]) => {
+  if (checkIns.length === 0) return 0;
+
+  let streak = 1; // Default streak length is 1
+  let currentDate = new Date(checkIns[0].createdAt);
+
+  // Loop through the check-ins and calculate the streak
+  for (let i = 1; i < checkIns.length; i++) {
+    const prevDate = new Date(checkIns[i].createdAt);
+    const diffDays = (currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24);
+
+    // If the check-in was made the previous day, increment the streak
+    if (diffDays === 1) {
+      streak++;
+    } else if (diffDays > 1) {
+      break; // Streak is broken, stop the calculation
+    }
+
+    currentDate = prevDate;
+  }
+
+  return streak;
+};

@@ -1,5 +1,6 @@
 'use client';
 import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { CardWithTitle } from '@/components/ui/card-with-title';
 import { AchievementsList } from '@/components/achievements-list';
@@ -9,21 +10,45 @@ import { WPBar } from '@/components/ui/wp-bar';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton'; // Use the custom Skeleton component
 import api from '@/app/api-client/axios-config'; // Custom axios with email header
+import { useCheckInHistory } from '../api-client/check-in';
+import { Spinner } from '@/components/ui/spinner';
+import { useAchievementsQuery } from '../api-client/achievements';
+import type { Achievement } from '@/types/Achievement';
+import { useStreak } from '../api-client/check-in';
 
 export default function Home() {
   const { data: session } = useSession();
-
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['wp-status', session?.user?.email],
+  const email = session?.user?.email ?? '';
+  const {
+    data,
+    isLoading: isWpLoading,
+    error: wpError,
+  } = useQuery({
+    queryKey: ['wp-status', email],
     queryFn: async () => {
       const response = await api.get('/api/wp/wp-status');
       return response.data.results.wp;
     },
-    enabled: !!session?.user?.email,
+    enabled: !!email,
     refetchOnWindowFocus: true,
   });
+  const { data: checkIns, isLoading: isCheckInsLoading } = useCheckInHistory(email);
+  const {
+    data: achievements,
+    isLoading: isAchievementsLoading,
+    isError,
+    error: achievementsError,
+  } = useAchievementsQuery(email);
+  const { data: streakData, isLoading: isStreakLoading, error: streakError } = useStreak(email);
 
-  // Determine the bonsai tree level based on WP
+  const totalCheckIns = checkIns?.length ?? 0;
+  const unlockedAchievements =
+    achievements?.achievements?.filter((a: Achievement) => a.unlocked) ?? [];
+  const totalAchievements = unlockedAchievements.length;
+  const displayedStreak = streakData?.streak ?? 0;
+
+  const isLoading = isWpLoading || isCheckInsLoading || isAchievementsLoading || isStreakLoading;
+
   const getBonsaiTreeImage = (wp: number) => {
     if (wp <= 90) {
       return '/BonsaiLevel1.gif';
@@ -104,19 +129,42 @@ export default function Home() {
               {[
                 {
                   label: 'Current Streak',
-                  value: '7 days',
+                  value:
+                    isStreakLoading || !displayedStreak ? (
+                      <Spinner />
+                    ) : streakError ? (
+                      'No data'
+                    ) : displayedStreak > 0 ? (
+                      `${displayedStreak} days`
+                    ) : (
+                      'No streak'
+                    ),
                   bgColor: 'bg-purple-100',
                   textColor: 'text-purple-700',
                 },
                 {
                   label: 'Check-ins',
-                  value: '32',
+                  value:
+                    isCheckInsLoading || !totalCheckIns ? (
+                      <Spinner />
+                    ) : checkIns?.length === undefined ? (
+                      'No data'
+                    ) : (
+                      checkIns.length
+                    ),
                   bgColor: 'bg-blue-100',
                   textColor: 'text-blue-700',
                 },
                 {
                   label: 'Achievements',
-                  value: '8',
+                  value:
+                    isAchievementsLoading || !totalAchievements ? (
+                      <Spinner />
+                    ) : achievementsError ? (
+                      'No data'
+                    ) : (
+                      totalAchievements
+                    ),
                   bgColor: 'bg-amber-100',
                   textColor: 'text-amber-700',
                 },
