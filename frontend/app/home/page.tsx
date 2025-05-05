@@ -9,11 +9,13 @@ import { WPBar } from '@/components/ui/wp-bar';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton'; // Use the custom Skeleton component
 import api from '@/app/api-client/axios-config'; // Custom axios with email header
+import errorCatch from '../api-client/error-message';
+import { toast } from '@/hooks/use-toast';
 
 export default function Home() {
   const { data: session } = useSession();
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['wp-status', session?.user?.email],
     queryFn: async () => {
       const response = await api.get('/api/wp/wp-status');
@@ -22,6 +24,16 @@ export default function Home() {
     enabled: !!session?.user?.email,
     refetchOnWindowFocus: true,
   });
+
+  if (isError) {
+    const errorMessage = errorCatch(error);
+
+    toast({
+      title: 'Error!',
+      description: errorMessage,
+      variant: 'destructive',
+    });
+  }
 
   const wp = data || 0; // Default to 0 if data is undefined
 
