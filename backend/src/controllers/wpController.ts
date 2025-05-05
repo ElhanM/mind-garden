@@ -24,7 +24,6 @@ export const getWPStatus = async (req: Request, res: Response) => {
   const endDate = new Date(); // Always use today
 
   const wp = calculateWP(checkInDates, startDate, endDate);
-  console.log('WP:', wp);
 
   sendSuccess(res, { wp }, 200);
 };
