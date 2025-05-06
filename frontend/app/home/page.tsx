@@ -10,7 +10,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton'; // Use the custom Skeleton component
 import api from '@/app/api-client/axios-config'; // Custom axios with email header
 import errorCatch from '../api-client/error-message';
-import { toast } from '@/hooks/use-toast';
 
 export default function Home() {
   const { data: session } = useSession();
@@ -28,11 +27,16 @@ export default function Home() {
   if (isError) {
     const errorMessage = errorCatch(error);
 
-    toast({
-      title: 'Error!',
-      description: errorMessage,
-      variant: 'destructive',
-    });
+    return (
+      <PageLayout>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-500">Error</h1>
+            <p className="text-gray-700">{errorMessage}</p>
+          </div>
+        </div>
+      </PageLayout>
+    );
   }
 
   const wp = data || 0; // Default to 0 if data is undefined
