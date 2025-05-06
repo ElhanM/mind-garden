@@ -22,8 +22,6 @@ export const generateAIResponse = async (
   const processToken = async (token: string) => {
     const processedToken = token === '' ? '\n' : token;
 
-    console.log('Processed token: ', processedToken);
-
     result += processedToken;
     if (onToken) {
       onToken(processedToken);
@@ -60,7 +58,6 @@ export const generateAIResponse = async (
             return result;
           }
           if (content === '[ERROR]') throw new Error('Stream Error from server');
-          console.log('Content', content);
 
           await processToken(content);
         }
