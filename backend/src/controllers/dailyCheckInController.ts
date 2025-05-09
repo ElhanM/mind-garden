@@ -1,11 +1,10 @@
-// backend/src/controllers/dailyCheckInController.ts
 import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { DailyCheckIn } from '../entities/DailyCheckIn';
 import { throwError } from '../utils/responseHandlers';
 import { sendSuccess } from '../utils/responseHandlers';
 import { getUserByEmail } from '../utils/idHandler';
-import { Between, MoreThanOrEqual } from 'typeorm';
+import { Between } from 'typeorm';
 import { subDays, startOfDay } from 'date-fns'; // for clean date math
 
 export const createDailyCheckIn = async (req: Request, res: Response) => {
