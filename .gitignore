@@ -1,1 +1,7 @@
 node_modules
+mind-garden-key.pem
+elhan-mah_accessKeys.csv
+infra/terraform/.terraform
+infra/terraform/.terraform.lock.hcl
+infra/terraform/terraform.tfstate.backup
+infra/terraform/terraform.tfstate

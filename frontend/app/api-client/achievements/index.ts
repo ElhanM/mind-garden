@@ -1,12 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '../axios-config';
 
-async function fetchAchievements(email: string) {
-  const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/api/achievements/`, {
-    headers: {
-      'user-email': email,
-    },
-  });
+async function fetchAchievements() {
+  const response = await api.get('/api/achievements/');
 
   if (response.data.success !== true) {
     throw new Error(response.data.message || 'Failed to fetch achievements');
@@ -22,7 +18,7 @@ async function fetchAchievements(email: string) {
 export function useAchievementsQuery(email: string) {
   return useQuery({
     queryKey: ['achievements', email],
-    queryFn: () => fetchAchievements(email),
+    queryFn: () => fetchAchievements(),
     enabled: !!email,
   });
 }

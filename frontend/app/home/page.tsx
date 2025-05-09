@@ -48,7 +48,7 @@ export default function Home() {
                 alt="Bonsai Tree"
                 width={400}
                 height={400}
-                className="object-contain w-full max-w-md h-[300px] md:h-[400px]"
+                className="object-contain"
               />
             ) : (
               <Skeleton className="h-[300px] w-[300px] rounded-lg mx-auto mt-6" />

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 export class AppError extends Error {
   statusCode: number;
@@ -10,7 +10,12 @@ export class AppError extends Error {
   }
 }
 
-export const errorHandler = (err: Error | AppError, req: Request, res: Response) => {
+export const errorHandler = (
+  err: Error | AppError,
+  req: Request,
+  res: Response,
+  _: NextFunction
+) => {
   const statusCode = err instanceof AppError ? err.statusCode : 500;
   const message = err.message || 'Internal server error';
 
