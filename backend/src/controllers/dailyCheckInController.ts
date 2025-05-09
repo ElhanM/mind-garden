@@ -125,37 +125,38 @@ export const getLatestStreak = async (req: Request, res: Response) => {
 
   const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
 
-  // Get all check-ins for the user, ordered from newest to oldest
   const checkIns = await dailyCheckInRepository.find({
     where: { userId },
-    order: { createdAt: 'DESC' }, // Ordering from latest to earliest
+    order: { checkInDate: 'DESC' }, // Order by check_in_date
   });
 
-  // Calculate streak from check-ins
   const streak = calculateStreak(checkIns);
 
   sendSuccess(res, { streak }, 200);
 };
-
 const calculateStreak = (checkIns: DailyCheckIn[]) => {
-  if (checkIns.length === 0) return 0;
+  // Convert check-in dates to strings in server's timezone
+  const checkInDateStrings = new Set(
+    checkIns.map((ci) => new Date(ci.checkInDate).toLocaleDateString())
+  );
+  const todayStr = new Date().toLocaleDateString();
+  console.log(checkInDateStrings);
 
-  let streak = 1; // Default streak length is 1
-  let currentDate = new Date(checkIns[0].createdAt);
+  // If no check-in for today, streak is 0
+  if (!checkInDateStrings.has(todayStr)) {
+    return 0;
+  }
 
-  // Loop through the check-ins and calculate the streak
-  for (let i = 1; i < checkIns.length; i++) {
-    const prevDate = new Date(checkIns[i].createdAt);
-    const diffDays = (currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24);
-
-    // If the check-in was made the previous day, increment the streak
-    if (diffDays === 1) {
+  let streak = 1;
+  let currentDate = new Date();
+  while (true) {
+    currentDate.setDate(currentDate.getDate() - 1);
+    const prevDateStr = currentDate.toLocaleDateString();
+    if (checkInDateStrings.has(prevDateStr)) {
       streak++;
-    } else if (diffDays > 1) {
-      break; // Streak is broken, stop the calculation
+    } else {
+      break;
     }
-
-    currentDate = prevDate;
   }
 
   return streak;

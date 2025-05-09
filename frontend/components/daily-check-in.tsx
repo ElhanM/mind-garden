@@ -110,6 +110,8 @@ export function DailyCheckIn() {
 
       queryClient.invalidateQueries({ queryKey: ['achievements', email] });
 
+      queryClient.invalidateQueries({ queryKey: ['streak', email] });
+
       setOpen(false);
       reset();
       setSubmitting(false);

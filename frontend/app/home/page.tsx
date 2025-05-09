@@ -47,6 +47,8 @@ export default function Home() {
   const totalAchievements = unlockedAchievements.length;
   const displayedStreak = streakData?.streak ?? 0;
 
+  console.log('Streak: ', displayedStreak);
+
   const isLoading = isWpLoading || isCheckInsLoading || isAchievementsLoading || isStreakLoading;
 
   const getBonsaiTreeImage = (wp: number) => {
