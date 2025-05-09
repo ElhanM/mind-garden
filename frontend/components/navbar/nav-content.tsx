@@ -7,8 +7,7 @@ import { SignOutButton } from '@/components/sign-out';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Image from 'next/image';
-
-type Props = {};
+import { usePathname } from 'next/navigation';
 
 const navItems = [
   { href: '/home', label: 'Home' },
@@ -17,7 +16,8 @@ const navItems = [
   { href: '/achievements', label: 'Achievements' },
 ];
 
-const NavContent = (props: Props) => {
+const NavContent = () => {
+  const pathname = usePathname();
   return (
     <header className="border-b bg-white/80 backdrop-blur-sm">
       <PageContainer>
@@ -32,7 +32,11 @@ const NavContent = (props: Props) => {
             <DailyCheckIn />
             {navItems.map((item) => (
               <Link key={item.href} href={item.href}>
-                <Button variant="ghost" size="sm">
+                <Button
+                  variant={pathname === item.href ? 'default' : 'ghost'}
+                  size="sm"
+                  className={pathname === item.href ? 'bg-purple-100 text-purple-700' : ''}
+                >
                   {item.label}
                 </Button>
               </Link>
@@ -51,7 +55,11 @@ const NavContent = (props: Props) => {
                 <DailyCheckIn />
                 {navItems.map((item) => (
                   <Link key={item.href} href={item.href}>
-                    <Button variant="ghost" size="sm">
+                    <Button
+                      variant={pathname === item.href ? 'default' : 'ghost'}
+                      size="sm"
+                      className={pathname === item.href ? 'bg-purple-100 text-purple-700' : ''}
+                    >
                       {item.label}
                     </Button>
                   </Link>
