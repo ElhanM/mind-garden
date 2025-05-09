@@ -129,7 +129,6 @@ export const getLatestStreak = async (req: Request, res: Response) => {
     where: { userId },
     order: { checkInDate: 'DESC' },
   });
-  String;
 
   const streak = calculateStreak(checkIns);
 
@@ -146,7 +145,7 @@ const calculateStreak = (checkIns: DailyCheckIn[]) => {
   }
 
   let streak = 1;
-  let currentDate = new Date();
+  const currentDate = new Date();
   while (true) {
     currentDate.setDate(currentDate.getDate() - 1);
     const prevDateStr = currentDate.toLocaleDateString();
