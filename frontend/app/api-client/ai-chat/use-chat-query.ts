@@ -7,9 +7,6 @@ export const useChatHistory = (email: string, limit = 5) => {
     queryKey: ['chatHistory', email],
     queryFn: async ({ pageParam = 0 }) => {
       const response = await api.get('/api/chat/history', {
-        headers: {
-          'user-email': email,
-        },
         params: {
           offset: pageParam,
           limit,

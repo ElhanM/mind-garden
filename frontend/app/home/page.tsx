@@ -7,8 +7,8 @@ import { MoodHistory } from '@/components/mood-history';
 import { PageLayout } from '@/components/page-layout';
 import { WPBar } from '@/components/ui/wp-bar';
 import { useQuery } from '@tanstack/react-query';
-import { Skeleton } from '@/components/ui/skeleton'; // Use the custom Skeleton component
-import api from '@/app/api-client/axios-config'; // Custom axios with email header
+import { Skeleton } from '@/components/ui/skeleton';
+import api from '@/app/api-client/axios-config';
 import { useCheckInHistory } from '../api-client/check-in';
 import { Spinner } from '@/components/ui/spinner';
 import { useAchievementsQuery } from '../api-client/achievements';
@@ -62,29 +62,32 @@ export default function Home() {
 
   return (
     <PageLayout>
-      <div className="grid gap-10 md:grid-cols-2">
+      <div className="md:grid md:gap-10 md:grid-cols-2">
         <section className="flex flex-col items-center justify-center">
           {/* Dynamically render the bonsai tree image */}
-          <div className="h-[300px] w-full max-w-md md:h-[400px]">
+          <div className="h-[300px] w-full max-w-md mb-4">
             {!isLoading && data !== undefined ? (
               <Image
                 src={getBonsaiTreeImage(data)}
                 alt="Bonsai Tree"
                 width={400}
                 height={400}
-                className="object-contain w-full max-w-md h-[300px] md:h-[400px]"
+                className="object-contain w-full h-full"
               />
             ) : (
-              <Skeleton className="h-[300px] w-[300px] rounded-lg mx-auto mt-6" />
+              <Skeleton className="h-[300px] w-full rounded-lg" />
             )}
           </div>
 
-          {/* Pass the dynamically updated WP to WPBar */}
-          {!isLoading && data !== undefined ? (
-            <WPBar wp={data} />
-          ) : (
-            <Skeleton className="h-[106px] w-[448px] rounded-lg mx-auto mt-6" />
-          )}
+          <div className="h-[106px] w-full max-w-md mb-4">
+            {/* Pass the dynamically updated WP to WPBar */}
+            {!isLoading && data !== undefined ? (
+              <WPBar wp={data} />
+            ) : (
+              <Skeleton className="h-[106px] w-full rounded-lg" />
+            )}
+          </div>
+
           <div className="mt-10 w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 text-sm shadow-sm">
             <div className="mb-2 font-medium text-amber-800">Tree Levels</div>
             <div className="grid grid-cols-1 gap-1">

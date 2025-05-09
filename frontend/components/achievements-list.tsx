@@ -10,9 +10,10 @@ import type { Achievement } from '@/types/Achievement';
 export function AchievementsList() {
   const { data: session } = useSession();
   const email = session?.user?.email ?? '';
-  const { data: achievementsData, isLoading, isError } = useAchievementsQuery(email);
+  const { data: achievementsData, isLoading, isError, isFetched } = useAchievementsQuery(email);
 
-  if (isLoading) {
+  // Prioritize loading state to prevent error flash
+  if (isLoading || !isFetched) {
     return (
       <Card>
         <CardHeader>
@@ -27,6 +28,7 @@ export function AchievementsList() {
     );
   }
 
+  // Show error state only after fetch is complete
   if (isError || !achievementsData) {
     return (
       <Card>
