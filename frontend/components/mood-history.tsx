@@ -53,7 +53,7 @@ export function MoodHistory() {
         <CardTitle className="text-purple-700">Your Mood History</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between overflow-auto gap-2">
           {moodHistory.map((day, index) => (
             <div key={index} className="flex flex-col items-center">
               <div

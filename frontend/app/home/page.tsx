@@ -38,10 +38,10 @@ export default function Home() {
 
   return (
     <PageLayout>
-      <div className="grid gap-10 md:grid-cols-2">
+      <div className="md:grid md:gap-10 md:grid-cols-2">
         <section className="flex flex-col items-center justify-center">
           {/* Dynamically render the bonsai tree image */}
-          <div className="h-[300px] w-full max-w-md md:h-[400px]">
+          <div className="h-[300px] w-[100vw] max-w-md mb-4">
             {!isLoading && data !== undefined ? (
               <Image
                 src={getBonsaiTreeImage(data)}
@@ -51,16 +51,19 @@ export default function Home() {
                 className="object-contain"
               />
             ) : (
-              <Skeleton className="h-[300px] w-[300px] rounded-lg mx-auto mt-6" />
+              <Skeleton className="h-[300px] w-[90vw] rounded-lg mx-auto mt-6" />
             )}
           </div>
 
-          {/* Pass the dynamically updated WP to WPBar */}
-          {!isLoading && data !== undefined ? (
-            <WPBar wp={data} />
-          ) : (
-            <Skeleton className="h-[106px] w-[448px] rounded-lg mx-auto mt-6" />
-          )}
+          <div className="h-[106px] w-[100vw] max-w-md mb-4">
+            {/* Pass the dynamically updated WP to WPBar */}
+            {!isLoading && data !== undefined ? (
+              <WPBar wp={data} />
+            ) : (
+              <Skeleton className="h-[100%] w-[90vw] rounded-lg mx-auto mt-6" />
+            )}
+          </div>
+
           <div className="mt-10 w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 text-sm shadow-sm">
             <div className="mb-2 font-medium text-amber-800">Tree Levels</div>
             <div className="grid grid-cols-1 gap-1">

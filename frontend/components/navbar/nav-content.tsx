@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import * as React from 'react';
 
 const navItems = [
   { href: '/home', label: 'Home' },
@@ -18,6 +19,7 @@ const navItems = [
 
 const NavContent = () => {
   const pathname = usePathname();
+  const [open, setOpen] = React.useState(false);
   return (
     <header className="border-b bg-white/80 backdrop-blur-sm">
       <PageContainer>
@@ -43,18 +45,23 @@ const NavContent = () => {
             ))}
             <SignOutButton />
           </nav>
-          <Sheet>
+          <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => setOpen(true)}
+              >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-              <nav className="flex flex-col gap-4">
+              <nav className="flex flex-col gap-4 mt-6">
                 <DailyCheckIn />
                 {navItems.map((item) => (
-                  <Link key={item.href} href={item.href}>
+                  <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
                     <Button
                       variant={pathname === item.href ? 'default' : 'ghost'}
                       size="sm"
