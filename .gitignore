@@ -4,4 +4,5 @@ elhan-mah_accessKeys.csv
 infra/terraform/.terraform
 infra/terraform/.terraform.lock.hcl
 infra/terraform/terraform.tfstate.backup
+infra/terraform/.terraform.tfstate.lock.info
 infra/terraform/terraform.tfstate
