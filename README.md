@@ -40,7 +40,7 @@ Sure! Here's a refined and more polished version of your paragraph with **Terraf
 
 ### ☁️ Infrastructure & Deployment
 
-Deployed on **AWS EC2** for scalable compute resources, with **AWS RDS** managing a PostgreSQL database. **Docker** containers ensure consistency across environments, simplifying both development and deployment. Infrastructure is provisioned and managed using **Terraform**, enabling repeatable, version-controlled infrastructure as code. **GoDaddy** and **AWS Elastic IP** are used for domain and IP management. **Husky** is used for enforcing code quality through pre-commit hooks. 
+Deployed on **AWS EC2** for scalable compute resources, with **AWS RDS** managing a PostgreSQL database. **Docker** containers ensure consistency across environments, simplifying both development and deployment. Infrastructure is provisioned and managed using **Terraform**, enabling repeatable, version-controlled infrastructure as code. **GoDaddy** and **AWS Elastic IP** are used for domain and IP management. **Husky** is used for enforcing code quality through pre-commit hooks. **Nginx** serves as a reverse proxy, routing requests to the appropriate services. 
 
 ## 🎉 Join the MindGarden Movement!
-MindGarden makes mental self-care **simple, engaging, and rewarding**. Let’s cultivate a **happier, healthier mind**—one check-in at a time. 🌱💙
+MindGarden makes mental self-care **simple, engaging, and rewarding**. Let's cultivate a **happier, healthier mind**—one check-in at a time. 🌱💙
