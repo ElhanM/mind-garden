@@ -5,6 +5,8 @@ import { DailyCheckIn } from '../entities/DailyCheckIn';
 import { throwError } from '../utils/responseHandlers';
 import { sendSuccess } from '../utils/responseHandlers';
 import { getUserByEmail } from '../utils/idHandler';
+import { Between, MoreThanOrEqual } from 'typeorm';
+import { subDays, startOfDay } from 'date-fns'; // for clean date math
 
 export const createDailyCheckIn = async (req: Request, res: Response) => {
   const { mood, stressLevel, journalEntry } = req.body;
@@ -127,22 +129,20 @@ export const getLatestStreak = async (req: Request, res: Response) => {
 
   const checkIns = await dailyCheckInRepository.find({
     where: { userId },
-    order: { checkInDate: 'DESC' }, // Order by check_in_date
+    order: { checkInDate: 'DESC' },
   });
+  String;
 
   const streak = calculateStreak(checkIns);
 
   sendSuccess(res, { streak }, 200);
 };
 const calculateStreak = (checkIns: DailyCheckIn[]) => {
-  // Convert check-in dates to strings in server's timezone
   const checkInDateStrings = new Set(
     checkIns.map((ci) => new Date(ci.checkInDate).toLocaleDateString())
   );
   const todayStr = new Date().toLocaleDateString();
-  console.log(checkInDateStrings);
 
-  // If no check-in for today, streak is 0
   if (!checkInDateStrings.has(todayStr)) {
     return 0;
   }
@@ -160,4 +160,55 @@ const calculateStreak = (checkIns: DailyCheckIn[]) => {
   }
 
   return streak;
+};
+
+export const getMoodHistory = async (req: Request, res: Response) => {
+  const userEmail = req.headers['user-email'] as string;
+  if (!userEmail) {
+    throwError('Missing email. Log in!', 400);
+  }
+
+  const user = await getUserByEmail(userEmail);
+  const userId = user?.id;
+  if (!userId) {
+    throwError('User not found', 404);
+  }
+
+  const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
+
+  const today = new Date();
+  const sevenDaysAgo = startOfDay(subDays(today, 6));
+
+  const checkIns = await dailyCheckInRepository.find({
+    where: {
+      userId,
+      checkInDate: Between(sevenDaysAgo, today),
+    },
+    order: { checkInDate: 'DESC' },
+  });
+
+  const moodByDate: Record<string, { mood: string | null; stressLevel: number | null }> = {};
+  checkIns.forEach((entry) => {
+    const date = new Date(entry.checkInDate);
+    const dateStr = date.toISOString().split('T')[0];
+
+    moodByDate[dateStr] = {
+      mood: entry.mood || null,
+      stressLevel: entry.stressLevel || null,
+    };
+  });
+
+  const moodHistory = Array.from({ length: 7 }).map((_, i) => {
+    const date = subDays(today, 6 - i);
+    const dateStr = date.toISOString().split('T')[0];
+    const moodData = moodByDate[dateStr] || { mood: null, stressLevel: null };
+
+    return {
+      date: dateStr,
+      mood: moodData.mood,
+      stressLevel: moodData.stressLevel,
+    };
+  });
+
+  sendSuccess(res, moodHistory, 200);
 };

@@ -1,6 +1,5 @@
 'use client';
 import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { CardWithTitle } from '@/components/ui/card-with-title';
 import { AchievementsList } from '@/components/achievements-list';
@@ -46,8 +45,6 @@ export default function Home() {
     achievements?.achievements?.filter((a: Achievement) => a.unlocked) ?? [];
   const totalAchievements = unlockedAchievements.length;
   const displayedStreak = streakData?.streak ?? 0;
-
-  console.log('Streak: ', displayedStreak);
 
   const isLoading = isWpLoading || isCheckInsLoading || isAchievementsLoading || isStreakLoading;
 

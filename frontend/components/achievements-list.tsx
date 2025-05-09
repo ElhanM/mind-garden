@@ -1,9 +1,54 @@
+import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { achievements } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useAchievementsQuery } from '@/app/api-client/achievements';
+import { Spinner } from '@/components/ui/spinner';
+import { AchievementIcon, achievementIcons } from '@/app/api-client/achievements/achievementIcons';
+import type { Achievement } from '@/types/Achievement';
 
 export function AchievementsList() {
+  const { data: session } = useSession();
+  const email = session?.user?.email ?? '';
+  const { data: achievementsData, isLoading, isError } = useAchievementsQuery(email);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-purple-700">Recent Achievements</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-center">
+            <Spinner className="h-6 w-6" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isError || !achievementsData) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-purple-700">Recent Achievements</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-gray-500">Unable to load achievements.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const unlockedAchievements = achievementsData.achievements
+    .filter((achievement: Achievement) => achievement.unlocked)
+    .sort((a: Achievement, b: Achievement) => {
+      const dateA = a.date ? new Date(a.date).getTime() : 0; // Fallback to 0 if null
+      const dateB = b.date ? new Date(b.date).getTime() : 0; // Fallback to 0 if null
+      return dateB - dateA;
+    })
+    .slice(0, 3);
+
   return (
     <Card>
       <CardHeader>
@@ -11,21 +56,19 @@ export function AchievementsList() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {achievements.slice(0, 3).map((achievement) => (
+          {unlockedAchievements.map((achievement: Achievement) => (
             <div
               key={achievement.id}
-              className={`flex items-center gap-4 rounded-lg p-3 transition-colors ${
-                achievement.unlocked ? 'bg-purple-50' : 'bg-gray-100 opacity-60'
-              }`}
+              className="flex items-center gap-4 rounded-lg p-3 transition-colors bg-purple-50"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
-                {achievement.icon}
+                {achievementIcons[achievement.id as AchievementIcon]}
               </div>
               <div className="flex-1">
                 <h3 className="font-medium text-gray-900">{achievement.title}</h3>
                 <p className="text-sm text-gray-500">{achievement.description}</p>
               </div>
-              {achievement.unlocked && achievement.date && (
+              {achievement.date && (
                 <div className="text-xs text-gray-500">
                   {new Date(achievement.date).toLocaleDateString()}
                 </div>

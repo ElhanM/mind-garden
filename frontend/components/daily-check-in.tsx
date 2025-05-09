@@ -112,6 +112,8 @@ export function DailyCheckIn() {
 
       queryClient.invalidateQueries({ queryKey: ['streak', email] });
 
+      queryClient.invalidateQueries({ queryKey: ['moodHistory', email] });
+
       setOpen(false);
       reset();
       setSubmitting(false);
