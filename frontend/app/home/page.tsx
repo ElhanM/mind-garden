@@ -61,11 +61,7 @@ export default function Home() {
       setStreakDisplay('No data');
     } else if (streakSuccess) {
       const streak = streakData?.streak ?? 0;
-      if (streak > 0) {
-        setStreakDisplay(`${streak} days`);
-      } else {
-        setStreakDisplay('No streak');
-      }
+      setStreakDisplay(`${streak} days`);
     }
   }, [isStreakLoading, streakError, streakSuccess, streakData]);
 
