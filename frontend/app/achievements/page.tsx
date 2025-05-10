@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { AchievementIcon, achievementIcons } from '../api-client/achievements/achievementIcons';
 import { toast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Achievement } from '@/types/Achievement';
 
 export default function AchievementsPage() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
