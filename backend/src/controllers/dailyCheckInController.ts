@@ -9,7 +9,6 @@ import { getUserByEmail } from '../utils/idHandler';
 export const createDailyCheckIn = async (req: Request, res: Response) => {
   const { mood, stressLevel, journalEntry } = req.body;
   const userEmail = req.headers['user-email'] as string;
-
   if (!userEmail || !mood || !stressLevel) {
     throwError('Missing required fields', 400);
   }

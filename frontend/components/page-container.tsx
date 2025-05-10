@@ -6,5 +6,7 @@ interface PageContainerProps {
 }
 
 export function PageContainer({ children, className = '' }: PageContainerProps) {
-  return <div className={`container mx-auto p-4 ${className}`}>{children}</div>;
+  return (
+    <div className={`w-[100vw] overflow-hidden container mx-auto p-4 ${className}`}>{children}</div>
+  );
 }

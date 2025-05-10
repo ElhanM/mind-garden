@@ -20,14 +20,32 @@ const handler = NextAuth({
   adapter: PostgresAdapter(pool),
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_ID as string,
-      clientSecret: process.env.GOOGLE_SECRET as string,
+      clientId: process.env.GOOGLE_ID!,
+      clientSecret: process.env.GOOGLE_SECRET!,
     }),
   ],
+  session: {
+    strategy: 'jwt', // 👈 forces usage of JWT instead of DB sessions
+  },
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: '/auth/signin',
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async jwt({ token, account, user }) {
+      if (account?.id_token) {
+        // This is the ID token you need
+        token.idToken = account.id_token;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token?.idToken) {
+        (session as any).idToken = token.idToken;
+      }
+      return session;
+    },
+  },
 });
 
 export { handler as GET, handler as POST };

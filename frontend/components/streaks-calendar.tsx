@@ -71,7 +71,6 @@ export function StreaksCalendar() {
 
   // Custom handler for month change
   const handleMonthChange = (newMonth: Date) => {
-    console.log('Month changed to:', newMonth);
     setDisplayMonth(newMonth);
   };
 
