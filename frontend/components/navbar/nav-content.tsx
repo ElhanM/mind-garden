@@ -37,7 +37,11 @@ const NavContent = () => {
                 <Button
                   variant={pathname === item.href ? 'default' : 'ghost'}
                   size="sm"
-                  className={pathname === item.href ? 'bg-purple-100 text-purple-700' : ''}
+                  className={`${
+                    pathname === item.href
+                      ? 'bg-purple-100 text-purple-700 hover:text-white'
+                      : 'text-black hover:bg-purple-100 hover:text-purple-700'
+                  }`}
                 >
                   {item.label}
                 </Button>
