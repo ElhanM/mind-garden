@@ -1,5 +1,7 @@
 'use client';
 import { useSession } from 'next-auth/react';
+import type React from 'react';
+
 import Image from 'next/image';
 import { CardWithTitle } from '@/components/ui/card-with-title';
 import { AchievementsList } from '@/components/achievements-list';
@@ -15,10 +17,13 @@ import { useAchievementsQuery } from '../api-client/achievements';
 import type { Achievement } from '@/types/Achievement';
 import { useStreak } from '../api-client/check-in';
 import errorCatch from '../api-client/error-message';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const { data: session } = useSession();
   const email = session?.user?.email ?? '';
+  // Add state to control streak display
+  const [streakDisplay, setStreakDisplay] = useState<React.ReactNode>(<Spinner />);
 
   const {
     data,
@@ -42,7 +47,27 @@ export default function Home() {
     isError: isAchievementsError,
     error: achievementsError,
   } = useAchievementsQuery(email);
-  const { data: streakData, isLoading: isStreakLoading, error: streakError } = useStreak(email);
+  const {
+    data: streakData,
+    isLoading: isStreakLoading,
+    error: streakError,
+    isSuccess: streakSuccess,
+  } = useStreak(email);
+
+  useEffect(() => {
+    if (isStreakLoading) {
+      setStreakDisplay(<Spinner />);
+    } else if (streakError) {
+      setStreakDisplay('No data');
+    } else if (streakSuccess) {
+      const streak = streakData?.streak ?? 0;
+      if (streak > 0) {
+        setStreakDisplay(`${streak} days`);
+      } else {
+        setStreakDisplay('No streak');
+      }
+    }
+  }, [isStreakLoading, streakError, streakSuccess, streakData]);
 
   const totalCheckIns = checkIns?.length ?? 0;
   const unlockedAchievements =
@@ -90,11 +115,10 @@ export default function Home() {
       ) : (
         <div className="md:grid md:gap-10 md:grid-cols-2">
           <section className="flex flex-col items-center justify-center">
-            {/* Dynamically render the bonsai tree image */}
             <div className="h-[300px] w-full max-w-md mb-4">
               {!isLoading && data !== undefined ? (
                 <Image
-                  src={getBonsaiTreeImage(data)}
+                  src={getBonsaiTreeImage(data) || '/placeholder.svg'}
                   alt="Bonsai Tree"
                   width={400}
                   height={400}
@@ -157,16 +181,7 @@ export default function Home() {
                 {[
                   {
                     label: 'Current Streak',
-                    value:
-                      isStreakLoading || !displayedStreak ? (
-                        <Spinner />
-                      ) : streakError ? (
-                        'No data'
-                      ) : displayedStreak > 0 ? (
-                        `${displayedStreak} days`
-                      ) : (
-                        'No streak'
-                      ),
+                    value: streakDisplay,
                     bgColor: 'bg-purple-100',
                     textColor: 'text-purple-700',
                   },
