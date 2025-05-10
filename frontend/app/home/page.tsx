@@ -9,11 +9,12 @@ import { WPBar } from '@/components/ui/wp-bar';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton'; // Use the custom Skeleton component
 import api from '@/app/api-client/axios-config'; // Custom axios with email header
+import errorCatch from '../api-client/error-message';
 
 export default function Home() {
   const { data: session } = useSession();
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['wp-status', session?.user?.email],
     queryFn: async () => {
       const response = await api.get('/api/wp/wp-status');
@@ -22,6 +23,23 @@ export default function Home() {
     enabled: !!session?.user?.email,
     refetchOnWindowFocus: true,
   });
+
+  if (isError) {
+    const errorMessage = errorCatch(error);
+
+    return (
+      <PageLayout>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-500">Error</h1>
+            <p className="text-gray-700">{errorMessage}</p>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  const wp = data || 0; // Default to 0 if data is undefined
 
   // Determine the bonsai tree level based on WP
   const getBonsaiTreeImage = (wp: number) => {
