@@ -1,4 +1,4 @@
-type Achievement = {
+export type Achievement = {
   id: number;
   title: string;
   description: string;

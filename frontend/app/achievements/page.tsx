@@ -7,12 +7,13 @@ import { useSession } from 'next-auth/react';
 import { AchievementIcon, achievementIcons } from '../api-client/achievements/achievementIcons';
 import { toast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Achievement } from '@/types/Achievement';
 
 export default function AchievementsPage() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [unlockedAchievements, setUnlockedAchievements] = useState<Set<string>>(new Set());
+  const [unlockedAchievements, setUnlockedAchievements] = useState<Set<number>>(new Set());
   const { data: session } = useSession();
   const email = session?.user?.email ?? '';
   // Currently, logged-in user
@@ -26,7 +27,7 @@ export default function AchievementsPage() {
       setAchievements(data.achievements);
       setLoading(false);
 
-      data.achievements.forEach((achievement) => {
+      data.achievements.forEach((achievement: Achievement) => {
         // Loop through each achievement
         // I cannot use 'achievement' directly as it is defined in backend???
         if (achievement.unlocked && !unlockedAchievements.has(achievement.id)) {
