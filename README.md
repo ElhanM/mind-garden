@@ -36,8 +36,11 @@ Built with **Next.js** for fast performance and SEO optimization, styled using *
 ### 🛠️ Backend  
 Powered by **Express.js** for robust API handling and business logic, with **PostgreSQL** managing user data, check-ins, and AI interactions. **TypeORM** ensures structured database management, and **TypeScript** enhances reliability and clarity. Integrated **OpenAI API** enables an intelligent chatbot for mental wellness support.  
 
-### ☁️ Infrastructure & Deployment  
-Hosted on **AWS EC2** for scalability, with **AWS RDS** managing the PostgreSQL database for reliability. **GoDaddy** and **AWS Elastic IP** handle domain management, while **GitHub Actions** automates CI/CD pipelines. **Docker** ensures portability and scalability, and **Husky** is used for enforcing code quality through pre-commit hooks.  
+Sure! Here's a refined and more polished version of your paragraph with **Terraform** included:
+
+### ☁️ Infrastructure & Deployment
+
+Deployed on **AWS EC2** for scalable compute resources, with **AWS RDS** managing a PostgreSQL database. **Docker** containers ensure consistency across environments, simplifying both development and deployment. Infrastructure is provisioned and managed using **Terraform**, enabling repeatable, version-controlled infrastructure as code. **GoDaddy** and **AWS Elastic IP** are used for domain and IP management. **Husky** is used for enforcing code quality through pre-commit hooks. **Nginx** serves as a reverse proxy, routing requests to the appropriate services. 
 
 ## 🎉 Join the MindGarden Movement!
-MindGarden makes mental self-care **simple, engaging, and rewarding**. Let’s cultivate a **happier, healthier mind**—one check-in at a time. 🌱💙
+MindGarden makes mental self-care **simple, engaging, and rewarding**. Let's cultivate a **happier, healthier mind**—one check-in at a time. 🌱💙

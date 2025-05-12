@@ -106,6 +106,14 @@ export function DailyCheckIn() {
 
       queryClient.invalidateQueries({ queryKey: ['checkIns', email] });
 
+      queryClient.invalidateQueries({ queryKey: ['wp-status', email] });
+
+      queryClient.invalidateQueries({ queryKey: ['achievements', email] });
+
+      queryClient.invalidateQueries({ queryKey: ['streak', email] });
+
+      queryClient.invalidateQueries({ queryKey: ['moodHistory', email] });
+
       setOpen(false);
       reset();
       setSubmitting(false);

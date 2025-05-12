@@ -55,7 +55,7 @@ export function StreaksCalendar() {
 
   const { data: checkIns, isLoading } = useQuery({
     queryKey: ['checkIns', email],
-    queryFn: () => (email ? fetchCheckInsHistory(email) : Promise.resolve([])),
+    queryFn: () => (email ? fetchCheckInsHistory() : Promise.resolve([])),
     enabled: !!email,
   });
 
@@ -71,7 +71,6 @@ export function StreaksCalendar() {
 
   // Custom handler for month change
   const handleMonthChange = (newMonth: Date) => {
-    console.log('Month changed to:', newMonth);
     setDisplayMonth(newMonth);
   };
 
