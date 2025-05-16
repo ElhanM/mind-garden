@@ -38,16 +38,21 @@ export const useWPStore = create<WPState>((set, get) => ({
 
   setLevel: (newLevel) => {
     const oldLevel = get().level;
+    const lastShownLevel = parseInt(localStorage.getItem('lastLevelShown') ?? '0');
 
-    if (newLevel !== oldLevel) {
+    // Skip modal if we've already shown this transition
+    if (newLevel !== oldLevel && newLevel !== lastShownLevel) {
+      localStorage.setItem('lastLevelShown', String(newLevel));
+
       set({
         previousLevel: oldLevel,
         level: newLevel,
         transitionType: getTransitionType(oldLevel, newLevel),
         modalOpen: true,
       });
+    } else {
+      set({ level: newLevel }); // just update silently
     }
   },
-
   closeModal: () => set({ modalOpen: false, transitionType: null }),
 }));
