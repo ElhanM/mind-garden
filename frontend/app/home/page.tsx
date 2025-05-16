@@ -1,52 +1,47 @@
 'use client';
 import { useSession } from 'next-auth/react';
-import type React from 'react';
-
 import Image from 'next/image';
-import { CardWithTitle } from '@/components/ui/card-with-title';
-import { AchievementsList } from '@/components/achievements-list';
-import { MoodHistory } from '@/components/mood-history';
-import { PageLayout } from '@/components/page-layout';
-import { WPBar } from '@/components/ui/wp-bar';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
+
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import api from '@/app/api-client/axios-config';
-import { useCheckInHistory } from '../api-client/check-in';
 import { Spinner } from '@/components/ui/spinner';
+import { WPBar } from '@/components/ui/wp-bar';
+import { PageLayout } from '@/components/page-layout';
+import { CardWithTitle } from '@/components/ui/card-with-title';
+import { MoodHistory } from '@/components/mood-history';
+import { AchievementsList } from '@/components/achievements-list';
+import { useCheckInHistory } from '../api-client/check-in';
 import { useAchievementsQuery } from '../api-client/achievements';
-import type { Achievement } from '@/types/Achievement';
 import { useStreak } from '../api-client/check-in';
 import errorCatch from '../api-client/error-message';
-import { useEffect, useState } from 'react';
+import { useWPStore } from '@/store/store';
+import { LevelTransitionModal, type TransitionType } from '@/components/level-transition-modal';
+import type { Achievement } from '@/types/Achievement';
 
 export default function Home() {
   const { data: session } = useSession();
   const email = session?.user?.email ?? '';
-  // Add state to control streak display
-  const [streakDisplay, setStreakDisplay] = useState<React.ReactNode>(<Spinner />);
 
-  const {
-    data,
-    isLoading: isWpLoading,
-    isError: isWpError,
-    error: wpError,
-  } = useQuery({
-    queryKey: ['wp-status', email],
-    queryFn: async () => {
-      const response = await api.get('/api/wp/wp-status');
-      return response.data.results.wp;
-    },
-    enabled: !!email,
-    refetchOnWindowFocus: true,
-  });
+  const wp = useWPStore((s) => s.wp);
+  const level = useWPStore((s) => s.level);
+
+  const [transitionType, setTransitionType] = useState<TransitionType>(null);
+  const [showTransitionModal, setShowTransitionModal] = useState(false);
+
+  const previousLevelRef = useRef<number | null>(null);
 
   const { data: checkIns, isLoading: isCheckInsLoading } = useCheckInHistory(email);
+
   const {
     data: achievements,
     isLoading: isAchievementsLoading,
     isError: isAchievementsError,
     error: achievementsError,
   } = useAchievementsQuery(email);
+
   const {
     data: streakData,
     isLoading: isStreakLoading,
@@ -54,14 +49,16 @@ export default function Home() {
     isSuccess: streakSuccess,
   } = useStreak(email);
 
+  const [streakDisplay, setStreakDisplay] = useState<React.ReactNode>(<Spinner />);
+
+  // Handle streak display
   useEffect(() => {
     if (isStreakLoading) {
       setStreakDisplay(<Spinner />);
     } else if (streakError) {
       setStreakDisplay('No data');
     } else if (streakSuccess) {
-      const streak = streakData?.streak ?? 0;
-      setStreakDisplay(`${streak} days`);
+      setStreakDisplay(`${streakData?.streak ?? 0} days`);
     }
   }, [isStreakLoading, streakError, streakSuccess, streakData]);
 
@@ -69,26 +66,49 @@ export default function Home() {
   const unlockedAchievements =
     achievements?.achievements?.filter((a: Achievement) => a.unlocked) ?? [];
   const totalAchievements = unlockedAchievements.length;
-  const displayedStreak = streakData?.streak ?? 0;
 
-  console.log('Displayed streak: ', displayedStreak);
+  const isLoading = isCheckInsLoading || isAchievementsLoading || isStreakLoading;
+  const isError = isAchievementsError || !!streakError;
 
-  const isLoading = isWpLoading || isCheckInsLoading || isAchievementsLoading || isStreakLoading;
-  const isError = isWpError || isAchievementsError || !!streakError;
+  // Modal transitions
+  const handleLevelTransition = (newLevel: number, oldLevel: number | null) => {
+    if (oldLevel === null || newLevel === oldLevel) return;
 
-  const wp = data || 0; // Default to 0 if data is undefined
+    const transitions: Record<string, TransitionType> = {
+      '1-2': '1to2',
+      '2-1': '2to1',
+      '2-3': '2to3',
+      '3-2': '3to2',
+      '3-4': '3to4',
+      '4-3': '4to3',
+    };
 
-  // Determine the bonsai tree level based on WP
-  const getBonsaiTreeImage = (wp: number) => {
-    if (wp <= 90) {
-      return '/BonsaiLevel1.gif';
-    } else if (wp <= 190) {
-      return '/BonsaiLevel2.gif';
-    } else if (wp <= 290) {
-      return '/BonsaiLevel3.gif';
-    } else {
-      return '/BonsaiLevel4.gif';
+    const key = `${oldLevel}-${newLevel}`;
+    const transition = transitions[key];
+
+    if (transition) {
+      setTransitionType(transition);
+      setShowTransitionModal(true);
     }
+  };
+
+  useEffect(() => {
+    const oldLevel = previousLevelRef.current;
+    if (level !== undefined && oldLevel !== level) {
+      handleLevelTransition(level, oldLevel);
+      previousLevelRef.current = level;
+    }
+  }, [level]);
+
+  const closeTransitionModal = () => {
+    setShowTransitionModal(false);
+  };
+
+  const getBonsaiTreeImage = (wp: number) => {
+    if (wp <= 90) return '/BonsaiLevel1.gif';
+    if (wp <= 190) return '/BonsaiLevel2.gif';
+    if (wp <= 290) return '/BonsaiLevel3.gif';
+    return '/BonsaiLevel4.gif';
   };
 
   return (
@@ -98,13 +118,11 @@ export default function Home() {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-red-500">Error</h1>
             <p className="text-gray-700">
-              {isWpError && wpError
-                ? errorCatch(wpError)
-                : isAchievementsError && achievementsError
-                  ? errorCatch(achievementsError)
-                  : streakError
-                    ? errorCatch(streakError)
-                    : 'An unknown error occurred.'}
+              {isAchievementsError && achievementsError
+                ? errorCatch(achievementsError)
+                : streakError
+                  ? errorCatch(streakError)
+                  : 'An unknown error occurred.'}
             </p>
           </div>
         </div>
@@ -112,9 +130,9 @@ export default function Home() {
         <div className="md:grid md:gap-10 md:grid-cols-2">
           <section className="flex flex-col items-center justify-center">
             <div className="h-[300px] w-full max-w-md mb-4">
-              {!isLoading && data !== undefined ? (
+              {!isLoading && wp !== undefined ? (
                 <Image
-                  src={getBonsaiTreeImage(data) || '/placeholder.svg'}
+                  src={getBonsaiTreeImage(wp)}
                   alt="Bonsai Tree"
                   width={400}
                   height={400}
@@ -126,9 +144,8 @@ export default function Home() {
             </div>
 
             <div className="h-[106px] w-full max-w-md mb-4">
-              {/* Pass the dynamically updated WP to WPBar */}
-              {!isLoading && data !== undefined ? (
-                <WPBar wp={data} />
+              {!isLoading && wp !== undefined ? (
+                <WPBar wp={wp} />
               ) : (
                 <Skeleton className="h-[106px] w-full rounded-lg" />
               )}
@@ -138,39 +155,20 @@ export default function Home() {
               <div className="mb-2 font-medium text-amber-800">Tree Levels</div>
               <div className="grid grid-cols-1 gap-1">
                 {[
-                  {
-                    level: 'Level 1',
-                    range: '0-90 WP',
-                    levelColor: 'text-amber-700',
-                    rangeColor: 'text-amber-600',
-                  },
-                  {
-                    level: 'Level 2',
-                    range: '100-190 WP',
-                    levelColor: 'text-amber-700',
-                    rangeColor: 'text-amber-600',
-                  },
-                  {
-                    level: 'Level 3',
-                    range: '200-290 WP',
-                    levelColor: 'text-amber-700',
-                    rangeColor: 'text-amber-600',
-                  },
-                  {
-                    level: 'Level 4',
-                    range: '300-400 WP',
-                    levelColor: 'text-amber-700',
-                    rangeColor: 'text-amber-600',
-                  },
-                ].map((item, index) => (
-                  <div key={index} className="flex justify-between">
-                    <span className={item.levelColor}>{item.level}:</span>
-                    <span className={item.rangeColor}>{item.range}</span>
+                  { level: 'Level 1', range: '0-90 WP' },
+                  { level: 'Level 2', range: '100-190 WP' },
+                  { level: 'Level 3', range: '200-290 WP' },
+                  { level: 'Level 4', range: '300-400 WP' },
+                ].map((item, i) => (
+                  <div key={i} className="flex justify-between">
+                    <span className="text-amber-700">{item.level}:</span>
+                    <span className="text-amber-600">{item.range}</span>
                   </div>
                 ))}
               </div>
             </div>
           </section>
+
           <section className="space-y-6">
             <CardWithTitle title="Your Progress">
               <div className="grid gap-4 sm:grid-cols-3">
@@ -183,27 +181,13 @@ export default function Home() {
                   },
                   {
                     label: 'Check-ins',
-                    value:
-                      isCheckInsLoading || !totalCheckIns ? (
-                        <Spinner />
-                      ) : checkIns?.length === undefined ? (
-                        'No data'
-                      ) : (
-                        checkIns.length
-                      ),
+                    value: isCheckInsLoading ? <Spinner /> : totalCheckIns,
                     bgColor: 'bg-blue-100',
                     textColor: 'text-blue-700',
                   },
                   {
                     label: 'Achievements',
-                    value:
-                      isAchievementsLoading || !totalAchievements ? (
-                        <Spinner />
-                      ) : achievementsError ? (
-                        'No data'
-                      ) : (
-                        totalAchievements
-                      ),
+                    value: isAchievementsLoading ? <Spinner /> : totalAchievements,
                     bgColor: 'bg-amber-100',
                     textColor: 'text-amber-700',
                   },
