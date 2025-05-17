@@ -1,21 +1,8 @@
-// store.ts
 import { create } from 'zustand';
 
 export type TransitionType = '1to2' | '2to1' | '2to3' | '3to2' | '3to4' | '4to3' | null;
 
-interface WPState {
-  wp: number;
-  level: number;
-  previousLevel: number | null;
-  modalOpen: boolean;
-  transitionType: TransitionType;
-  setWP: (wp: number) => void;
-  setLevel: (newLevel: number) => void;
-  closeModal: () => void;
-}
-
 const getTransitionType = (oldLevel: number, newLevel: number): TransitionType => {
-  const key = `${oldLevel}-${newLevel}`;
   const transitions = {
     '1-2': '1to2',
     '2-1': '2to1',
@@ -24,8 +11,32 @@ const getTransitionType = (oldLevel: number, newLevel: number): TransitionType =
     '3-4': '3to4',
     '4-3': '4to3',
   } as const;
-  return transitions[key] ?? null;
+  return transitions[`${oldLevel}-${newLevel}` as keyof typeof transitions] ?? null;
 };
+
+function getLevelFromWP(wp: number): number {
+  if (wp <= 90) return 1;
+  if (wp <= 190) return 2;
+  if (wp <= 290) return 3;
+  return 4;
+}
+
+interface WPState {
+  wp: number;
+  level: number;
+  previousLevel: number | null;
+  modalOpen: boolean;
+  transitionType: TransitionType;
+
+  // Silent update (used by WPProvider)
+  setWP: (wp: number) => void;
+
+  // Triggers transition modal (used after check-in)
+  updateWPWithTransition: (wp: number, supressModal: boolean) => void;
+
+  // Modal control
+  closeModal: () => void;
+}
 
 export const useWPStore = create<WPState>((set, get) => ({
   wp: 0,
@@ -33,26 +44,41 @@ export const useWPStore = create<WPState>((set, get) => ({
   previousLevel: null,
   modalOpen: false,
   transitionType: null,
-
-  setWP: (wp) => set({ wp }),
-
-  setLevel: (newLevel) => {
+  setWP: (wp) => {
     const oldLevel = get().level;
-    const lastShownLevel = parseInt(localStorage.getItem('lastLevelShown') ?? '0');
+    const newLevel = getLevelFromWP(wp);
 
-    // Skip modal if we've already shown this transition
-    if (newLevel !== oldLevel && newLevel !== lastShownLevel) {
-      localStorage.setItem('lastLevelShown', String(newLevel));
+    const isLevelChanged = newLevel !== oldLevel;
 
+    if (isLevelChanged) {
       set({
+        wp,
+        level: newLevel,
+      });
+    } else {
+      set({ wp, level: oldLevel }); // just update silently
+    }
+  },
+
+  // Updates WP, checks for level transition, and opens modal if needed
+  updateWPWithTransition: (wp: number, suppressModal = false) => {
+    const oldLevel = get().level;
+    const newLevel = getLevelFromWP(wp);
+
+    const levelChanged = newLevel !== oldLevel;
+
+    if (levelChanged) {
+      set({
+        wp,
         previousLevel: oldLevel,
         level: newLevel,
         transitionType: getTransitionType(oldLevel, newLevel),
-        modalOpen: true,
+        modalOpen: !suppressModal, // ← this alone is enough
       });
     } else {
-      set({ level: newLevel }); // just update silently
+      set({ wp }); // silent update
     }
   },
+
   closeModal: () => set({ modalOpen: false, transitionType: null }),
 }));

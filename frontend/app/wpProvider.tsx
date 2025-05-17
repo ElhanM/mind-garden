@@ -1,4 +1,3 @@
-// app/providers.tsx
 'use client';
 
 import { ReactNode, useEffect } from 'react';
@@ -10,7 +9,6 @@ import { useSession } from 'next-auth/react';
 
 export function WPProvider({ children }: { children: ReactNode }) {
   const setWP = useWPStore((s) => s.setWP);
-  const setLevel = useWPStore((s) => s.setLevel);
   const { data: session } = useSession();
   const email = session?.user?.email ?? '';
 
@@ -36,7 +34,6 @@ export function WPProvider({ children }: { children: ReactNode }) {
     queryKey: ['wp-status', email],
     queryFn: async () => {
       const res = await api.get('/api/wp/wp-status');
-
       return (res.data.results.wp + 90) as number;
     },
     refetchOnWindowFocus: true,
@@ -44,12 +41,9 @@ export function WPProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (wp !== undefined) {
-      setWP(wp);
-
-      const level = wp <= 90 ? 1 : wp <= 190 ? 2 : wp <= 290 ? 3 : 4;
-      setLevel(level); // Zustand handles transitions and modals now
+      useWPStore.getState().updateWPWithTransition(wp, true); // suppress modal on refetch
     }
-  }, [wp, setWP, setLevel]);
+  }, [wp]);
 
   return (
     <>

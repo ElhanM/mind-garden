@@ -1,11 +1,7 @@
 'use client';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import React, { useEffect, useRef, useState } from 'react';
-
-import { useQuery } from '@tanstack/react-query';
-
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
 import { WPBar } from '@/components/ui/wp-bar';
@@ -13,12 +9,11 @@ import { PageLayout } from '@/components/page-layout';
 import { CardWithTitle } from '@/components/ui/card-with-title';
 import { MoodHistory } from '@/components/mood-history';
 import { AchievementsList } from '@/components/achievements-list';
-import { useCheckInHistory } from '../api-client/check-in';
+
+import { useCheckInHistory, useStreak } from '../api-client/check-in';
 import { useAchievementsQuery } from '../api-client/achievements';
-import { useStreak } from '../api-client/check-in';
 import errorCatch from '../api-client/error-message';
 import { useWPStore } from '@/store/store';
-import { LevelTransitionModal, type TransitionType } from '@/components/level-transition-modal';
 import type { Achievement } from '@/types/Achievement';
 
 export default function Home() {
@@ -26,12 +21,6 @@ export default function Home() {
   const email = session?.user?.email ?? '';
 
   const wp = useWPStore((s) => s.wp);
-  const level = useWPStore((s) => s.level);
-
-  const [transitionType, setTransitionType] = useState<TransitionType>(null);
-  const [showTransitionModal, setShowTransitionModal] = useState(false);
-
-  const previousLevelRef = useRef<number | null>(null);
 
   const { data: checkIns, isLoading: isCheckInsLoading } = useCheckInHistory(email);
 
@@ -51,7 +40,6 @@ export default function Home() {
 
   const [streakDisplay, setStreakDisplay] = useState<React.ReactNode>(<Spinner />);
 
-  // Handle streak display
   useEffect(() => {
     if (isStreakLoading) {
       setStreakDisplay(<Spinner />);
@@ -69,40 +57,6 @@ export default function Home() {
 
   const isLoading = isCheckInsLoading || isAchievementsLoading || isStreakLoading;
   const isError = isAchievementsError || !!streakError;
-
-  // Modal transitions
-  const handleLevelTransition = (newLevel: number, oldLevel: number | null) => {
-    if (oldLevel === null || newLevel === oldLevel) return;
-
-    const transitions: Record<string, TransitionType> = {
-      '1-2': '1to2',
-      '2-1': '2to1',
-      '2-3': '2to3',
-      '3-2': '3to2',
-      '3-4': '3to4',
-      '4-3': '4to3',
-    };
-
-    const key = `${oldLevel}-${newLevel}`;
-    const transition = transitions[key];
-
-    if (transition) {
-      setTransitionType(transition);
-      setShowTransitionModal(true);
-    }
-  };
-
-  useEffect(() => {
-    const oldLevel = previousLevelRef.current;
-    if (level !== undefined && oldLevel !== level) {
-      handleLevelTransition(level, oldLevel);
-      previousLevelRef.current = level;
-    }
-  }, [level]);
-
-  const closeTransitionModal = () => {
-    setShowTransitionModal(false);
-  };
 
   const getBonsaiTreeImage = (wp: number) => {
     if (wp <= 90) return '/BonsaiLevel1.gif';
