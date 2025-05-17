@@ -9,8 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-
-export type TransitionType = '1to2' | '2to1' | '2to3' | '3to2' | '3to4' | '4to3' | null;
+import { TransitionType } from '@/types/TransitionType';
 
 interface LevelTransitionModalProps {
   isOpen: boolean;

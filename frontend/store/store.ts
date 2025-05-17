@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-
-export type TransitionType = '1to2' | '2to1' | '2to3' | '3to2' | '3to4' | '4to3' | null;
+import { TransitionType } from '@/types/TransitionType';
 
 const getTransitionType = (oldLevel: number, newLevel: number): TransitionType => {
   const transitions = {
@@ -28,16 +27,14 @@ interface WPState {
   modalOpen: boolean;
   transitionType: TransitionType;
 
-  // Silent update (used by WPProvider)
   setWP: (wp: number) => void;
 
-  // Triggers transition modal (used after check-in)
   updateWPWithTransition: (wp: number, supressModal: boolean) => void;
 
-  // Modal control
   closeModal: () => void;
 }
 
+//this is only used for updating btw, no modals or nothing here
 export const useWPStore = create<WPState>((set, get) => ({
   wp: 0,
   level: 1,
@@ -60,7 +57,6 @@ export const useWPStore = create<WPState>((set, get) => ({
     }
   },
 
-  // Updates WP, checks for level transition, and opens modal if needed
   updateWPWithTransition: (wp: number, suppressModal = false) => {
     const oldLevel = get().level;
     const newLevel = getLevelFromWP(wp);
@@ -73,7 +69,7 @@ export const useWPStore = create<WPState>((set, get) => ({
         previousLevel: oldLevel,
         level: newLevel,
         transitionType: getTransitionType(oldLevel, newLevel),
-        modalOpen: !suppressModal, // ← this alone is enough
+        modalOpen: !suppressModal, //  this alone is enough
       });
     } else {
       set({ wp }); // silent update

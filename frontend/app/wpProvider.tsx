@@ -34,7 +34,7 @@ export function WPProvider({ children }: { children: ReactNode }) {
     queryKey: ['wp-status', email],
     queryFn: async () => {
       const res = await api.get('/api/wp/wp-status');
-      return (res.data.results.wp + 90) as number;
+      return res.data.results.wp as number;
     },
     refetchOnWindowFocus: true,
   });
