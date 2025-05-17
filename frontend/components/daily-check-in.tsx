@@ -41,6 +41,7 @@ import type { CheckInFormData } from '../validation/check-in-schema';
 import { checkInSchema } from '../validation/check-in-schema';
 import errorCatch from '@/app/api-client/error-message';
 import compareDatesWithoutTimestamp from '@/validation/compare-dates-without-timestamp';
+import { useWPStore } from '@/store/store';
 
 export function DailyCheckIn() {
   const [open, setOpen] = useState(false);
@@ -95,7 +96,7 @@ export function DailyCheckIn() {
       if (!email) throw new Error('User email is required');
       return submitCheckIn(formData, email);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: 'Success!',
         description: 'Check-in submitted successfully.',
@@ -114,6 +115,10 @@ export function DailyCheckIn() {
 
       queryClient.invalidateQueries({ queryKey: ['moodHistory', email] });
 
+      const currentWp = useWPStore.getState().wp;
+      const newWp = currentWp + 10; // optimistic update, wp will always grow by 10 only
+
+      useWPStore.getState().updateWPWithTransition(newWp, false);
       setOpen(false);
       reset();
       setSubmitting(false);

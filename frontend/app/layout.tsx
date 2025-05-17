@@ -6,6 +6,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { SessionGuard } from '@/components/auth/session-guard';
 import { Toaster } from '@/components/ui/toaster';
+import { WPProvider } from './wpProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,16 +22,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <SessionGuard>
             <div className="flex min-h-screen flex-col bg-gradient-to-b from-purple-50 to-blue-50">
-              <Navbar />
-              <main className="flex-1">{children}</main>
-              <footer className="border-t bg-white py-6">
-                <PageContainer>
-                  <p className="text-center text-sm text-gray-500">
-                    MindGarden - Nurture your mental wellness journey
-                  </p>
-                  <Toaster />
-                </PageContainer>
-              </footer>
+              <WPProvider>
+                <Navbar />
+                <main className="flex-1">{children}</main>
+                <footer className="border-t bg-white py-6">
+                  <PageContainer>
+                    <p className="text-center text-sm text-gray-500">
+                      MindGarden - Nurture your mental wellness journey
+                    </p>
+                    <Toaster />
+                  </PageContainer>
+                </footer>
+              </WPProvider>
             </div>
           </SessionGuard>
         </Providers>
