@@ -31,7 +31,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ Response Interceptor - logout on 401
+// Response Interceptor - logout on 401
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
