@@ -9,6 +9,9 @@ import wpRoutes from './routes/wpRoutes';
 import chatRoutes from './routes/chatRoutes';
 import achievementRoutes from './routes/achievementRoutes';
 import { sendSuccess } from './utils/responseHandlers';
+import { authMiddleware } from './middleware/authMiddleware';
+import { rateLimiter } from './utils/rateLimiter';
+import { corsOptions } from './utils/cors';
 
 // Initialize database connection
 AppDataSource.initialize()
@@ -23,22 +26,6 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Middleware
-const whitelist = [
-  'http://localhost:3000',
-  'https://mind-garden.hyper6xhurmasice.online',
-  'http://mind-garden.hyper6xhurmasice.online',
-];
-const corsOptions: cors.CorsOptions = {
-  origin: function (origin, callback) {
-    console.log('Request from origin:', origin); // Add this line for debugging
-    if (!origin || whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      console.log(`Rejecting request from unauthorized origin: ${origin}`);
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
-    }
-  },
-};
 app.use(cors(corsOptions));
 app.use(express.json());
 
@@ -46,6 +33,10 @@ app.use(express.json());
 app.use('/health', (_req, res) => {
   sendSuccess(res, 'Server is healthy!');
 });
+
+// Apply both authMiddleware and rateLimiter to all routes in the app except health check
+app.use(authMiddleware, rateLimiter);
+
 app.use('/api/check-ins', dailyCheckInRoutes);
 app.use('/api/wp', wpRoutes);
 app.use('/api/chat', chatRoutes);

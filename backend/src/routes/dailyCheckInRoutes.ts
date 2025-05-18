@@ -6,13 +6,8 @@ import {
   getLatestStreak,
   getMoodHistory,
 } from '../controllers/dailyCheckInController';
-import { authMiddleware } from '../middleware/authMiddleware'; // Authentication middleware
-import { rateLimiter } from '../utils/rateLimiter'; // Rate limiter
 
 const router = express.Router();
-
-// Apply both authMiddleware and rateLimiter to all routes in this router
-router.use(authMiddleware, rateLimiter);
 
 // POST route for creating a daily check-in
 router.post('/', createDailyCheckIn);
