@@ -71,8 +71,6 @@ export default function Home() {
   const totalAchievements = unlockedAchievements.length;
   const displayedStreak = streakData?.streak ?? 0;
 
-  console.log('Displayed streak: ', displayedStreak);
-
   const isLoading = isWpLoading || isCheckInsLoading || isAchievementsLoading || isStreakLoading;
   const isError = isWpError || isAchievementsError || !!streakError;
 
