@@ -134,7 +134,7 @@ export const getLatestStreak = async (req: Request, res: Response) => {
 
   sendSuccess(res, { streak }, 200);
 };
-const calculateStreak = (checkIns: DailyCheckIn[]) => {
+export const calculateStreak = (checkIns: DailyCheckIn[]) => {
   const checkInDateStrings = new Set(
     checkIns.map((ci) => new Date(ci.checkInDate).toLocaleDateString())
   );

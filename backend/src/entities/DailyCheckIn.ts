@@ -20,7 +20,7 @@ export class DailyCheckIn {
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: User | null;
 
   @Column({
     type: 'varchar',

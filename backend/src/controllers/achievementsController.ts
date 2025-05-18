@@ -3,7 +3,7 @@ import { fetchCheckInsForUser } from './dailyCheckInController';
 import { sendSuccess, throwError } from '../utils/responseHandlers';
 import { Achievement } from '../types/Achievement';
 
-function getStreakDate(
+export function getStreakDate(
   records: Array<{ checkInDate: Date; createdAt: Date }>,
   requiredStreak: number
 ): string | null {
