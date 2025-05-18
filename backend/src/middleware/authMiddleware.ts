@@ -30,10 +30,17 @@ export const authMiddleware = async (
     throwError('Invalid token format', 401);
   }
 
-  const ticket = await client.verifyIdToken({
-    idToken: token as string,
-    audience: process.env.GOOGLE_ID,
-  });
+  let ticket;
+  try {
+    ticket = await client.verifyIdToken({
+      idToken: token as string,
+      audience: process.env.GOOGLE_ID,
+    });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throwError(`Error verifying token: ${errorMessage}`, 401);
+    return;
+  }
 
   const payload = ticket.getPayload();
 
