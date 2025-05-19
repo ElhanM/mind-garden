@@ -1,18 +1,25 @@
+import { getAuthHeaders } from './getAuthHeaders';
+import { signOut } from 'next-auth/react';
+
 export const generateAIResponse = async (
   email: string,
   input: string,
   onToken?: (token: string) => void,
   streamDelay = 0
 ) => {
+  const headers = await getAuthHeaders();
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify({ email, input }),
   });
 
   if (!response.body) throw new Error('No response body');
+
+  if (response.status === 401) {
+    console.warn('Token expired or unauthorized. Logging out...');
+    await signOut({ callbackUrl: '/' });
+  }
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder('utf-8');
