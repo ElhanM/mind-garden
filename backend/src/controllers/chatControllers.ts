@@ -13,7 +13,8 @@ const openai = new OpenAI({
 });
 
 export async function streamChatMessage(req: Request, res: Response) {
-  const { email, input } = req.body;
+  const { input } = req.body;
+  const email = req.headers['user-email'] as string;
 
   if (!email || !input) {
     throwError('Email and input are required', 400);
@@ -113,7 +114,7 @@ export const getChatHistory = async (req: Request, res: Response) => {
   const userId = user?.id;
 
   if (!user) {
-    throwError('User not found!', 500);
+    throwError('User not found!', 401);
   }
 
   const chatRepository = AppDataSource.getRepository(Chat);

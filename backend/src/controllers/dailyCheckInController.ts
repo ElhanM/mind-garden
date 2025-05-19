@@ -74,7 +74,7 @@ export const getCheckInsHistory = async (req: Request, res: Response) => {
   const userId = user?.id;
 
   if (!userId) {
-    throwError('User not found', 404);
+    throwError('User not found', 401);
   }
 
   const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
@@ -97,7 +97,7 @@ export const fetchCheckInsForUser = async (email: string) => {
   const userId = user?.id;
 
   if (!userId) {
-    throwError('User not found', 404);
+    throwError('User not found', 401);
   }
 
   const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
@@ -120,7 +120,7 @@ export const getLatestStreak = async (req: Request, res: Response) => {
   const userId = user?.id;
 
   if (!userId) {
-    throwError('User not found', 404);
+    throwError('User not found', 401);
   }
 
   const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);
@@ -168,7 +168,7 @@ export const getMoodHistory = async (req: Request, res: Response) => {
   const user = await getUserByEmail(userEmail);
   const userId = user?.id;
   if (!userId) {
-    throwError('User not found', 404);
+    throwError('User not found', 401);
   }
 
   const dailyCheckInRepository = AppDataSource.getRepository(DailyCheckIn);

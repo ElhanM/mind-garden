@@ -11,7 +11,7 @@ export const getUserByEmail = async (userEmail: string) => {
   const user = await userRepository.findOne({ where: { email: userEmail } });
 
   if (!user) {
-    throwError('User not found', 404);
+    throwError('User not found', 401);
   }
 
   return user;
