@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -58,13 +58,17 @@ export function ChatInterface() {
 
   const { addMessage, updateLastMessage } = useAddChatMessage();
 
-  const allMessages = chatData
-    ? chatData.pages
-        .slice()
-        .reverse()
-        .flatMap((page) => page.messages)
-    : [];
-  const messages = [welcomeMessage, ...allMessages];
+  const allMessages = useMemo(
+    () =>
+      chatData
+        ? chatData.pages
+            .slice()
+            .reverse()
+            .flatMap((page) => page.messages)
+        : [],
+    [chatData]
+  );
+  const messages = useMemo(() => [welcomeMessage, ...allMessages], [welcomeMessage, allMessages]);
   useEffect(() => {
     if (!loadMoreRef.current || !hasNextPage) return;
 
