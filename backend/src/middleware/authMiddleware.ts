@@ -37,7 +37,7 @@ export const authMiddleware = async (
       audience: process.env.GOOGLE_ID,
     });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
     throwError(`Error verifying token: ${errorMessage}`, 401);
     return;
   }

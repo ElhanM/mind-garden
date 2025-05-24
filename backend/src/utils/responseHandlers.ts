@@ -10,5 +10,6 @@ export const sendSuccess = (res: Response, results: unknown, statusCode = 200) =
 
 // Instead of sending error responses, throw custom errors
 export const throwError = (message: string, statusCode = 400) => {
+  console.log(`Error: ${message} (Status Code: ${statusCode})`);
   throw new AppError(message, statusCode);
 };
