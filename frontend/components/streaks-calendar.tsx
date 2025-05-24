@@ -30,10 +30,12 @@ export function StreaksCalendar() {
     // Ensure the container element exists before measuring
     if (!containerRef.current) return;
 
+    const node = containerRef.current;
+
     // Function to update the container width
     const updateWidth = () => {
-      if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth);
+      if (node) {
+        setContainerWidth(node.offsetWidth);
       }
     };
 
@@ -43,12 +45,12 @@ export function StreaksCalendar() {
     // Update on resize
     // Create a ResizeObserver to track container size changes
     const resizeObserver = new ResizeObserver(updateWidth);
-    resizeObserver.observe(containerRef.current);
+    resizeObserver.observe(node);
 
     // Cleanup function: Stop observing on unmount
     return () => {
-      if (containerRef.current) {
-        resizeObserver.unobserve(containerRef.current);
+      if (node) {
+        resizeObserver.unobserve(node);
       }
     };
   }, []); // Runs only once when component mounts
