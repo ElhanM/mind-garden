@@ -20,8 +20,9 @@ export function AchievementsList() {
           <CardTitle className="text-purple-700">Recent Achievements</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-center">
-            <Skeleton className="h-12 w-full" />
+          <div className="flex flex-col items-center gap-4">
+            <Skeleton className="h-[68px] w-full" />
+            <Skeleton className="h-[40px] w-1/3" />
           </div>
         </CardContent>
       </Card>

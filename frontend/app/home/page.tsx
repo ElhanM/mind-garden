@@ -16,13 +16,11 @@ import { useAchievementsQuery } from '../api-client/achievements';
 import type { Achievement } from '@/types/Achievement';
 import { useStreak } from '../api-client/check-in';
 import errorCatch from '../api-client/error-message';
-import { useEffect, useState } from 'react';
 
 export default function Home() {
   const { data: session } = useSession();
   const email = session?.user?.email ?? '';
   // Add state to control streak display
-  const [streakDisplay, setStreakDisplay] = useState<React.ReactNode>(null);
 
   const {
     data,
@@ -46,23 +44,13 @@ export default function Home() {
     isError: isAchievementsError,
     error: achievementsError,
   } = useAchievementsQuery(email);
+
   const {
     data: streakData,
     isLoading: isStreakLoading,
     error: streakError,
     isSuccess: streakSuccess,
   } = useStreak(email);
-
-  useEffect(() => {
-    if (isStreakLoading) {
-      setStreakDisplay(<Skeleton className="h-6 w-24 mx-auto bg-purple-300" />);
-    } else if (streakError) {
-      setStreakDisplay('No data');
-    } else if (streakSuccess) {
-      const streak = streakData?.streak ?? 0;
-      setStreakDisplay(`${streak} days`);
-    }
-  }, [isStreakLoading, streakError, streakSuccess, streakData]);
 
   const totalCheckIns = checkIns?.length ?? 0;
   const unlockedAchievements =
@@ -174,7 +162,14 @@ export default function Home() {
                 {[
                   {
                     label: 'Current Streak',
-                    value: streakDisplay,
+                    value:
+                      isStreakLoading || !streakData ? (
+                        <Skeleton className="h-9 w-12 mx-auto bg-purple-300" />
+                      ) : streakError ? (
+                        'No data'
+                      ) : (
+                        `${displayedStreak} days`
+                      ),
                     bgColor: 'bg-purple-200',
                     textColor: 'text-purple-700',
                   },
@@ -182,7 +177,7 @@ export default function Home() {
                     label: 'Check-ins',
                     value:
                       isCheckInsLoading || !totalCheckIns ? (
-                        <Skeleton className="h-6 w-12 mx-auto bg-blue-300" />
+                        <Skeleton className="h-9 w-12 mx-auto bg-blue-300" />
                       ) : checkIns?.length === undefined ? (
                         'No data'
                       ) : (
@@ -195,7 +190,7 @@ export default function Home() {
                     label: 'Achievements',
                     value:
                       isAchievementsLoading || !totalAchievements ? (
-                        <Skeleton className="h-6 w-12 mx-auto bg-yellow-300" />
+                        <Skeleton className="h-9 w-12 mx-auto bg-yellow-300" />
                       ) : achievementsError ? (
                         'No data'
                       ) : (

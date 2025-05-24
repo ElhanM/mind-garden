@@ -53,13 +53,13 @@ export function MoodHistory() {
         </CardHeader>
         <CardContent>
           <div className="flex justify-around">
-            <Skeleton className="size-[40px]" />
-            <Skeleton className="size-[40px]" />
-            <Skeleton className="size-[40px]" />
-            <Skeleton className="size-[40px]" />
-            <Skeleton className="size-[40px]" />
-            <Skeleton className="size-[40px]" />
-            <Skeleton className="size-[40px]" />
+            <Skeleton className="h-[84px] w-[56px]" />
+            <Skeleton className="h-[84px] w-[56px]" />
+            <Skeleton className="h-[84px] w-[56px]" />
+            <Skeleton className="h-[84px] w-[56px]" />
+            <Skeleton className="h-[84px] w-[56px]" />
+            <Skeleton className="h-[84px] w-[56px]" />
+            <Skeleton className="h-[84px] w-[56px]" />
           </div>
         </CardContent>
       </Card>
