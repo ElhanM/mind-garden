@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useAchievementsQuery } from '@/app/api-client/achievements';
-import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from './ui/skeleton';
 import { AchievementIcon, achievementIcons } from '@/app/api-client/achievements/achievementIcons';
 import type { Achievement } from '@/types/Achievement';
 
@@ -20,8 +20,9 @@ export function AchievementsList() {
           <CardTitle className="text-purple-700">Recent Achievements</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-center">
-            <Spinner className="h-6 w-6" />
+          <div className="flex flex-col items-center gap-4">
+            <Skeleton className="h-[68px] w-full" />
+            <Skeleton className="h-[40px] w-1/3" />
           </div>
         </CardContent>
       </Card>

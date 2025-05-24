@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Spinner } from './ui/spinner';
+import { Skeleton } from './ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
@@ -153,7 +153,7 @@ export function DailyCheckIn() {
         >
           {checkInLoading || !email ? (
             <>
-              <Spinner className="text-gray-50 mr-2 h-4 w-4" />
+              <Skeleton className="mr-2 h-4 w-4" />
               Daily Check-in
             </>
           ) : (
@@ -269,7 +269,7 @@ export function DailyCheckIn() {
                 >
                   {submitting ? (
                     <>
-                      <Spinner className="text-gray-50 mr-2 h-4 w-4" /> Check-in
+                      <Skeleton className="mr-2 h-4 w-4" /> Check-in
                     </>
                   ) : (
                     <>
