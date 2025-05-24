@@ -42,10 +42,14 @@ export function ChatInterface() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const wasDeleted = useRef(false);
-  const welcomeMessage: ChatMessage = {
-    role: 'system',
-    content: "Welcome to MindGarden! I'm your mental wellness assistant. How can I help you today?",
-  };
+  const welcomeMessage = useMemo<ChatMessage>(
+    () => ({
+      role: 'system',
+      content:
+        "Welcome to MindGarden! I'm your mental wellness assistant. How can I help you today?",
+    }),
+    []
+  );
 
   const {
     data: chatData,
