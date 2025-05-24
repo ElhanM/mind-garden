@@ -12,7 +12,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import api from '@/app/api-client/axios-config';
 import { useCheckInHistory } from '../api-client/check-in';
-import { Spinner } from '@/components/ui/spinner';
 import { useAchievementsQuery } from '../api-client/achievements';
 import type { Achievement } from '@/types/Achievement';
 import { useStreak } from '../api-client/check-in';
@@ -23,7 +22,7 @@ export default function Home() {
   const { data: session } = useSession();
   const email = session?.user?.email ?? '';
   // Add state to control streak display
-  const [streakDisplay, setStreakDisplay] = useState<React.ReactNode>(<Spinner />);
+  const [streakDisplay, setStreakDisplay] = useState<React.ReactNode>(null);
 
   const {
     data,
@@ -56,7 +55,7 @@ export default function Home() {
 
   useEffect(() => {
     if (isStreakLoading) {
-      setStreakDisplay(<Spinner />);
+      setStreakDisplay(<Skeleton className="h-6 w-24 mx-auto bg-purple-300" />);
     } else if (streakError) {
       setStreakDisplay('No data');
     } else if (streakSuccess) {
@@ -176,14 +175,14 @@ export default function Home() {
                   {
                     label: 'Current Streak',
                     value: streakDisplay,
-                    bgColor: 'bg-purple-100',
+                    bgColor: 'bg-purple-200',
                     textColor: 'text-purple-700',
                   },
                   {
                     label: 'Check-ins',
                     value:
                       isCheckInsLoading || !totalCheckIns ? (
-                        <Spinner />
+                        <Skeleton className="h-6 w-12 mx-auto bg-blue-300" />
                       ) : checkIns?.length === undefined ? (
                         'No data'
                       ) : (
@@ -196,7 +195,7 @@ export default function Home() {
                     label: 'Achievements',
                     value:
                       isAchievementsLoading || !totalAchievements ? (
-                        <Spinner />
+                        <Skeleton className="h-6 w-12 mx-auto bg-yellow-300" />
                       ) : achievementsError ? (
                         'No data'
                       ) : (

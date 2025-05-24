@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sun, Cloud, CloudSun, CloudRain, CloudLightning, X } from 'lucide-react';
 import { useMoodHistory } from '@/app/api-client/mood';
 import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from './ui/skeleton';
 
 export function MoodHistory() {
   const { data: session } = useSession();
@@ -51,8 +52,14 @@ export function MoodHistory() {
           <CardTitle className="text-purple-700">Your Mood History</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-center">
-            <Spinner className="h-6 w-6" />
+          <div className="flex justify-around">
+            <Skeleton className="size-[40px]" />
+            <Skeleton className="size-[40px]" />
+            <Skeleton className="size-[40px]" />
+            <Skeleton className="size-[40px]" />
+            <Skeleton className="size-[40px]" />
+            <Skeleton className="size-[40px]" />
+            <Skeleton className="size-[40px]" />
           </div>
         </CardContent>
       </Card>
