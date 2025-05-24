@@ -37,10 +37,17 @@ export default function Home() {
     refetchOnWindowFocus: true,
   });
 
-  const { data: checkIns, isLoading: isCheckInsLoading } = useCheckInHistory(email);
+  const {
+    data: checkIns,
+    isLoading: isCheckInsLoading,
+    isFetching: isCheckInsFetching,
+    isError: isCheckInsError,
+    error: checkInsError,
+  } = useCheckInHistory(email);
   const {
     data: achievements,
     isLoading: isAchievementsLoading,
+    isFetching: isAchievementsFetching,
     isError: isAchievementsError,
     error: achievementsError,
   } = useAchievementsQuery(email);
@@ -48,11 +55,10 @@ export default function Home() {
   const {
     data: streakData,
     isLoading: isStreakLoading,
+    isFetching: isStreakFetching,
     error: streakError,
-    isSuccess: streakSuccess,
   } = useStreak(email);
 
-  const totalCheckIns = checkIns?.length ?? 0;
   const unlockedAchievements =
     achievements?.achievements?.filter((a: Achievement) => a.unlocked) ?? [];
   const totalAchievements = unlockedAchievements.length;
@@ -60,8 +66,6 @@ export default function Home() {
 
   const isLoading = isWpLoading || isCheckInsLoading || isAchievementsLoading || isStreakLoading;
   const isError = isWpError || isAchievementsError || !!streakError;
-
-  const wp = data || 0; // Default to 0 if data is undefined
 
   // Determine the bonsai tree level based on WP
   const getBonsaiTreeImage = (wp: number) => {
@@ -162,40 +166,39 @@ export default function Home() {
                 {[
                   {
                     label: 'Current Streak',
-                    value:
-                      isStreakLoading || !streakData ? (
-                        <Skeleton className="h-9 w-12 mx-auto bg-purple-300" />
-                      ) : streakError ? (
-                        'No data'
-                      ) : (
-                        `${displayedStreak} days`
-                      ),
+                    value: streakError ? (
+                      '0'
+                    ) : isStreakLoading || (!streakData && !streakError) ? (
+                      <Skeleton className="h-9 w-12 mx-auto bg-purple-300" />
+                    ) : (
+                      `${displayedStreak} days`
+                    ),
                     bgColor: 'bg-purple-200',
                     textColor: 'text-purple-700',
                   },
                   {
                     label: 'Check-ins',
-                    value:
-                      isCheckInsLoading || !totalCheckIns ? (
-                        <Skeleton className="h-9 w-12 mx-auto bg-blue-300" />
-                      ) : checkIns?.length === undefined ? (
-                        'No data'
-                      ) : (
-                        checkIns.length
-                      ),
+                    value: isCheckInsError ? (
+                      '0'
+                    ) : isCheckInsLoading || (!checkIns && !checkInsError) ? (
+                      <Skeleton className="h-9 w-12 mx-auto bg-blue-300" />
+                    ) : checkIns?.length === undefined ? (
+                      '0'
+                    ) : (
+                      checkIns.length
+                    ),
                     bgColor: 'bg-blue-100',
                     textColor: 'text-blue-700',
                   },
                   {
                     label: 'Achievements',
-                    value:
-                      isAchievementsLoading || !totalAchievements ? (
-                        <Skeleton className="h-9 w-12 mx-auto bg-yellow-300" />
-                      ) : achievementsError ? (
-                        'No data'
-                      ) : (
-                        totalAchievements
-                      ),
+                    value: isAchievementsError ? (
+                      '0'
+                    ) : isAchievementsLoading || (!achievements && !achievementsError) ? (
+                      <Skeleton className="h-9 w-12 mx-auto bg-yellow-300" />
+                    ) : (
+                      totalAchievements
+                    ),
                     bgColor: 'bg-amber-100',
                     textColor: 'text-amber-700',
                   },
