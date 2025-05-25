@@ -47,6 +47,10 @@ CREATE TABLE users
     PRIMARY KEY (id)
 );
 
+ALTER TABLE "accounts" ADD CONSTRAINT "fk_accounts_users" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "sessions" ADD CONSTRAINT "fk_sessions_users" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 -- Daily check-ins table
 CREATE TABLE daily_check_ins (
     id SERIAL PRIMARY KEY,
