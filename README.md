@@ -1,12 +1,5 @@
 # 🌱 MindGarden: Your AI-Powered Mental Wellness Companion
 
-### 👥 Team Members
-- **Elhan Mahmutović**
-- **Mirza Abdulahović**
-- **Vedad Kruho**
-- **Mustafa Sinanović**
-- **Belmir Grahić**
-
 ## 🌿 Overview
 MindGarden is a cutting-edge mental wellness platform that combines **AI-powered chat support** and a **gamified reward system** to help users maintain their psychological well-being through **daily check-ins**. By offering a unique, visual representation of personal growth, MindGarden transforms mental self-care into an **engaging and rewarding journey**.
 
@@ -45,4 +38,4 @@ Powered by **Express.js** for robust API handling and business logic, with **Pos
 Deployed on **AWS** for scalable compute and managed database resources. **Docker** containers ensure consistency across environments, streamlining both development and deployment. Infrastructure is provisioned and managed using **Terraform**, enabling repeatable, version-controlled infrastructure as code. **GoDaddy** and AWS-managed IPs are used for domain and IP management. **Husky** enforces code quality through pre-commit hooks. **Nginx** acts as a reverse proxy, efficiently routing requests to the appropriate services.
 
 ## 🎉 Join the MindGarden Movement!
-MindGarden makes mental self-care **simple, engaging, and rewarding**. Let's cultivate a **happier, healthier mind**—one check-in at a time. 🌱💙
+MindGarden makes mental self-care **simple, engaging, and rewarding**. Let's cultivate a **happier, healthier mind** - one check-in at a time. 🌱💙
