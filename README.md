@@ -25,8 +25,8 @@ The **Japanese bonsai tree** serves as a powerful visual motivator, offering a *
 ## Tree of Mindfulness Progression:
 
 | Level 1 | Level 2 | Level 3 | Level 4 |
-| --- | --- | --- | --- |
-|  |  |  |  |
+|---------|---------|---------|---------|
+| ![Bonsai Level 1](./frontend/public/BonsaiLevel1.gif) | ![Bonsai Level 2](./frontend/public/BonsaiLevel2.gif) | ![Bonsai Level 3](./frontend/public/BonsaiLevel3.gif) | ![Bonsai Level 4](./frontend/public/BonsaiLevel4.gif) |
 
 ## Tech Stack & Implementation
 
